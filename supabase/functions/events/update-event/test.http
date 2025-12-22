@@ -1,0 +1,56 @@
+### Variables
+@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@authToken = YOUR_JWT_TOKEN_HERE
+
+### Test 1 - Mise à jour complète (cas nominal)
+PUT {{baseUrl}}/events/update-event
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_id": "event-uuid-here",
+  "title": "Nouveau titre",
+  "event_date": "2024-12-26T18:00:00Z",
+  "guest_count": 200,
+  "status": "confirmed"
+}
+
+### Test 2 - Mise à jour partielle
+PUT {{baseUrl}}/events/update-event
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_id": "event-uuid-here",
+  "title": "Titre modifié"
+}
+
+### Test 3 - Erreur: event_id manquant
+PUT {{baseUrl}}/events/update-event
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "title": "Nouveau titre"
+}
+
+### Test 4 - Erreur: événement terminé
+PUT {{baseUrl}}/events/update-event
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_id": "completed-event-uuid",
+  "title": "Titre modifié"
+}
+
+### Test 5 - Erreur: statut invalide
+PUT {{baseUrl}}/events/update-event
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_id": "event-uuid-here",
+  "status": "invalid_status"
+}
+

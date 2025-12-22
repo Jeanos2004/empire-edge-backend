@@ -1,0 +1,66 @@
+### Variables
+@baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
+@authToken = YOUR_JWT_TOKEN_HERE
+
+### Test 1 - Inscription réussie (cas nominal)
+POST {{baseUrl}}/auth-register
+Content-Type: application/json
+
+{
+  "email": "client@example.com",
+  "password": "password123",
+  "first_name": "Jean",
+  "last_name": "Dupont",
+  "phone": "+224612345678",
+  "company_name": "Entreprise Test",
+  "address": "123 Rue Test",
+  "city": "Conakry"
+}
+
+### Test 2 - Inscription avec données minimales
+POST {{baseUrl}}/auth-register
+Content-Type: application/json
+
+{
+  "email": "client2@example.com",
+  "password": "password123",
+  "first_name": "Marie",
+  "last_name": "Martin",
+  "phone": "+224612345679"
+}
+
+### Test 3 - Erreur: email manquant
+POST {{baseUrl}}/auth-register
+Content-Type: application/json
+
+{
+  "password": "password123",
+  "first_name": "Jean",
+  "last_name": "Dupont",
+  "phone": "+224612345678"
+}
+
+### Test 4 - Erreur: mot de passe trop court
+POST {{baseUrl}}/auth-register
+Content-Type: application/json
+
+{
+  "email": "client3@example.com",
+  "password": "123",
+  "first_name": "Jean",
+  "last_name": "Dupont",
+  "phone": "+224612345678"
+}
+
+### Test 5 - Erreur: format email invalide
+POST {{baseUrl}}/auth-register
+Content-Type: application/json
+
+{
+  "email": "email-invalide",
+  "password": "password123",
+  "first_name": "Jean",
+  "last_name": "Dupont",
+  "phone": "+224612345678"
+}
+

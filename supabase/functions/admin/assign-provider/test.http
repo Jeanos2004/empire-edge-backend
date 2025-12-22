@@ -1,0 +1,52 @@
+### Variables
+@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@authToken = YOUR_JWT_TOKEN_HERE
+
+### Test 1 - Assigner un prestataire (cas nominal)
+POST {{baseUrl}}/admin/assign-provider
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_service_id": "event-service-uuid-here",
+  "provider_id": "provider-uuid-here"
+}
+
+### Test 2 - Erreur: event_service_id manquant
+POST {{baseUrl}}/admin/assign-provider
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "provider_id": "provider-uuid-here"
+}
+
+### Test 3 - Erreur: provider_id manquant
+POST {{baseUrl}}/admin/assign-provider
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_service_id": "event-service-uuid-here"
+}
+
+### Test 4 - Erreur: prestataire incompatible
+POST {{baseUrl}}/admin/assign-provider
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_service_id": "event-service-traiteur-uuid",
+  "provider_id": "provider-decoration-uuid"
+}
+
+### Test 5 - Erreur: accès non autorisé
+POST {{baseUrl}}/admin/assign-provider
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "event_service_id": "event-service-uuid-here",
+  "provider_id": "provider-uuid-here"
+}
+

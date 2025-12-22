@@ -1,0 +1,20 @@
+### Variables
+@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@authToken = YOUR_JWT_TOKEN_HERE
+
+### Test 1 - Récupérer toutes les statistiques (cas nominal)
+GET {{baseUrl}}/admin/dashboard-stats
+Authorization: Bearer {{authToken}}
+
+### Test 2 - Statistiques pour une période spécifique
+GET {{baseUrl}}/admin/dashboard-stats?start_date=2024-01-01&end_date=2024-12-31
+Authorization: Bearer {{authToken}}
+
+### Test 3 - Statistiques depuis une date
+GET {{baseUrl}}/admin/dashboard-stats?start_date=2024-06-01
+Authorization: Bearer {{authToken}}
+
+### Test 4 - Erreur: accès non autorisé (client)
+GET {{baseUrl}}/admin/dashboard-stats
+Authorization: Bearer {{clientToken}}
+

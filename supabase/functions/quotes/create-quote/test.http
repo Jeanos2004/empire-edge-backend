@@ -1,0 +1,88 @@
+### Variables
+@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@authToken = YOUR_JWT_TOKEN_HERE
+
+### Test 1 - Créer un devis complet (cas nominal)
+POST {{baseUrl}}/quotes/create-quote
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_id": "event-uuid-here",
+  "items": [
+    {
+      "event_service_id": "event-service-uuid-1",
+      "description": "Service traiteur premium",
+      "quantity": 1,
+      "unit_price": 2000000
+    },
+    {
+      "event_service_id": "event-service-uuid-2",
+      "description": "Décoration florale",
+      "quantity": 1,
+      "unit_price": 1500000
+    }
+  ],
+  "tax_rate": 0.18,
+  "discount_amount": 100000,
+  "validity_date": "2024-12-31T23:59:59Z"
+}
+
+### Test 2 - Créer un devis avec items personnalisés
+POST {{baseUrl}}/quotes/create-quote
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_id": "event-uuid-here",
+  "items": [
+    {
+      "description": "Service personnalisé",
+      "quantity": 2,
+      "unit_price": 500000
+    }
+  ]
+}
+
+### Test 3 - Erreur: event_id manquant
+POST {{baseUrl}}/quotes/create-quote
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "items": [
+    {
+      "description": "Service",
+      "quantity": 1,
+      "unit_price": 1000000
+    }
+  ]
+}
+
+### Test 4 - Erreur: items vides
+POST {{baseUrl}}/quotes/create-quote
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_id": "event-uuid-here",
+  "items": []
+}
+
+### Test 5 - Erreur: remise supérieure au sous-total
+POST {{baseUrl}}/quotes/create-quote
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_id": "event-uuid-here",
+  "items": [
+    {
+      "description": "Service",
+      "quantity": 1,
+      "unit_price": 1000000
+    }
+  ],
+  "discount_amount": 2000000
+}
+

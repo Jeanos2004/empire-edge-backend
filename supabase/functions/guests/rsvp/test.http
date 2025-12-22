@@ -1,0 +1,50 @@
+### Variables
+@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+
+### Test 1 - RSVP via token (cas nominal - public)
+POST {{baseUrl}}/guests/rsvp
+Content-Type: application/json
+
+{
+  "token": "invitation-token-here",
+  "rsvp_status": "accepted"
+}
+
+### Test 2 - RSVP via guest_id (authentifié)
+POST {{baseUrl}}/guests/rsvp
+Content-Type: application/json
+
+{
+  "guest_id": "guest-uuid-here",
+  "rsvp_status": "declined"
+}
+
+### Test 3 - RSVP via GET (public)
+GET {{baseUrl}}/guests/rsvp?token=invitation-token-here&rsvp_status=maybe
+
+### Test 4 - Erreur: paramètres manquants
+POST {{baseUrl}}/guests/rsvp
+Content-Type: application/json
+
+{
+  "rsvp_status": "accepted"
+}
+
+### Test 5 - Erreur: statut invalide
+POST {{baseUrl}}/guests/rsvp
+Content-Type: application/json
+
+{
+  "token": "invitation-token-here",
+  "rsvp_status": "invalid_status"
+}
+
+### Test 6 - Erreur: token invalide
+POST {{baseUrl}}/guests/rsvp
+Content-Type: application/json
+
+{
+  "token": "invalid-token",
+  "rsvp_status": "accepted"
+}
+

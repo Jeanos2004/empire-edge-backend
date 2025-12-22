@@ -1,0 +1,58 @@
+### Variables
+@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@authToken = YOUR_JWT_TOKEN_HERE
+
+### Test 1 - Réserver un lieu (cas nominal)
+POST {{baseUrl}}/venues/reserve-venue
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_id": "event-uuid-here",
+  "venue_id": "venue-uuid-here",
+  "date": "2024-12-25T18:00:00Z"
+}
+
+### Test 2 - Erreur: event_id manquant
+POST {{baseUrl}}/venues/reserve-venue
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "venue_id": "venue-uuid-here",
+  "date": "2024-12-25T18:00:00Z"
+}
+
+### Test 3 - Erreur: lieu non disponible
+POST {{baseUrl}}/venues/reserve-venue
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_id": "event-uuid-here",
+  "venue_id": "unavailable-venue-uuid",
+  "date": "2024-12-25T18:00:00Z"
+}
+
+### Test 4 - Erreur: capacité dépassée
+POST {{baseUrl}}/venues/reserve-venue
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_id": "event-with-too-many-guests-uuid",
+  "venue_id": "small-venue-uuid",
+  "date": "2024-12-25T18:00:00Z"
+}
+
+### Test 5 - Erreur: lieu déjà réservé
+POST {{baseUrl}}/venues/reserve-venue
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_id": "event-uuid-here",
+  "venue_id": "already-reserved-venue-uuid",
+  "date": "2024-12-25T18:00:00Z"
+}
+

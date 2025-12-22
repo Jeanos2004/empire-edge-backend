@@ -1,0 +1,24 @@
+### Variables
+@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@authToken = YOUR_JWT_TOKEN_HERE
+
+### Test 1 - Récupérer tous les événements (cas nominal)
+GET {{baseUrl}}/admin/get-all-events
+Authorization: Bearer {{authToken}}
+
+### Test 2 - Filtrer par statut
+GET {{baseUrl}}/admin/get-all-events?status=confirmed
+Authorization: Bearer {{authToken}}
+
+### Test 3 - Filtrer par client
+GET {{baseUrl}}/admin/get-all-events?client_id=client-uuid-here
+Authorization: Bearer {{authToken}}
+
+### Test 4 - Combinaison de filtres avec pagination
+GET {{baseUrl}}/admin/get-all-events?status=draft&event_type=mariage&start_date=2024-01-01&page=1&limit=10
+Authorization: Bearer {{authToken}}
+
+### Test 5 - Erreur: accès non autorisé
+GET {{baseUrl}}/admin/get-all-events
+Authorization: Bearer {{clientToken}}
+

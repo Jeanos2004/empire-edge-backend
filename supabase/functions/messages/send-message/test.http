@@ -1,0 +1,54 @@
+### Variables
+@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@authToken = YOUR_JWT_TOKEN_HERE
+
+### Test 1 - Envoyer un message (cas nominal)
+POST {{baseUrl}}/messages/send-message
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "recipient_id": "recipient-uuid-here",
+  "event_id": "event-uuid-here",
+  "subject": "Question sur l'événement",
+  "content": "Bonjour, j'aimerais avoir plus d'informations sur l'événement."
+}
+
+### Test 2 - Envoyer un message sans sujet
+POST {{baseUrl}}/messages/send-message
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "recipient_id": "recipient-uuid-here",
+  "content": "Message simple sans sujet"
+}
+
+### Test 3 - Erreur: recipient_id manquant
+POST {{baseUrl}}/messages/send-message
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "content": "Message sans destinataire"
+}
+
+### Test 4 - Erreur: content manquant
+POST {{baseUrl}}/messages/send-message
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "recipient_id": "recipient-uuid-here"
+}
+
+### Test 5 - Erreur: destinataire inexistant
+POST {{baseUrl}}/messages/send-message
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "recipient_id": "00000000-0000-0000-0000-000000000000",
+  "content": "Message"
+}
+

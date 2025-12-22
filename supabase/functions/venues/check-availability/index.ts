@@ -1,0 +1,127 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+serve(async (req) => {
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
+  try {
+    // Créer client Supabase
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: { Authorization: req.headers.get('Authorization')! },
+        },
+      }
+    )
+
+    // Parser les query params
+    const url = new URL(req.url)
+    const venueId = url.searchParams.get('venue_id')
+    const date = url.searchParams.get('date')
+
+    if (!venueId) {
+      throw new Error('venue_id est requis')
+    }
+
+    if (!date) {
+      throw new Error('date est requise')
+    }
+
+    // Vérifier que le lieu existe
+    const { data: venue, error: venueError } = await supabaseClient
+      .from('venues')
+      .select('id, name, is_available, capacity_max')
+      .eq('id', venueId)
+      .single()
+
+    if (venueError || !venue) {
+      throw new Error('Lieu introuvable')
+    }
+
+    // Vérifier la disponibilité générale
+    if (!venue.is_available) {
+      return new Response(
+        JSON.stringify({
+          success: true,
+          data: {
+            venue_id: venueId,
+            date: date,
+            is_available: false,
+            reason: 'Le lieu n\'est pas disponible actuellement'
+          }
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        },
+      )
+    }
+
+    // Vérifier la disponibilité pour la date spécifique
+    const dateOnly = date.split('T')[0]
+    const { data: availability, error: availabilityError } = await supabaseClient
+      .from('venue_availability')
+      .select('is_available')
+      .eq('venue_id', venueId)
+      .eq('date', dateOnly)
+      .single()
+
+    // Si pas d'entrée dans venue_availability, le lieu est disponible par défaut
+    let isAvailable = true
+    if (availability) {
+      isAvailable = availability.is_available
+    }
+
+    // Vérifier si le lieu est déjà réservé pour cette date via un événement
+    const { data: existingEvent } = await supabaseClient
+      .from('events')
+      .select('id, title')
+      .eq('venue_id', venueId)
+      .eq('event_date', date)
+      .limit(1)
+      .single()
+
+    if (existingEvent) {
+      isAvailable = false
+    }
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: {
+          venue_id: venueId,
+          venue_name: venue.name,
+          date: dateOnly,
+          is_available: isAvailable,
+          capacity_max: venue.capacity_max,
+        }
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      },
+    )
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error.message || 'Erreur lors de la vérification de la disponibilité'
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      },
+    )
+  }
+})
+

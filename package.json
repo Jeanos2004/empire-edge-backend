@@ -1,0 +1,17 @@
+{
+  "name": "empire-events-edge-functions",
+  "version": "1.0.0",
+  "description": "Edge Functions pour Empire Events",
+  "scripts": {
+    "deploy": "./deploy-functions-fixed.sh",
+    "deploy:function": "./deploy-functions-fixed.sh",
+    "setup": "npm install -g supabase && supabase login"
+  },
+  "keywords": [
+    "supabase",
+    "edge-functions"
+  ],
+  "author": "",
+  "license": "ISC"
+}
+

@@ -1,0 +1,38 @@
+### Variables
+@baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
+
+### Test 1 - Connexion réussie (cas nominal)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "client@example.com",
+  "password": "password123"
+}
+
+### Test 2 - Erreur: email manquant
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "password": "password123"
+}
+
+### Test 3 - Erreur: mot de passe incorrect
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "client@example.com",
+  "password": "mauvais_mot_de_passe"
+}
+
+### Test 4 - Erreur: utilisateur inexistant
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "inexistant@example.com",
+  "password": "password123"
+}
+

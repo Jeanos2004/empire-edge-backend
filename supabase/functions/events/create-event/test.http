@@ -1,0 +1,68 @@
+### Variables
+@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@authToken = YOUR_JWT_TOKEN_HERE
+
+### Test 1 - Créer événement complet (cas nominal)
+POST {{baseUrl}}/events/create-event
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_type": "mariage",
+  "event_category": "cérémonie",
+  "title": "Mariage de Jean et Marie",
+  "event_date": "2024-12-25T18:00:00Z",
+  "venue_id": "venue-uuid-here",
+  "guest_count": 150,
+  "budget_min": 5000000,
+  "budget_max": 10000000,
+  "style": "moderne",
+  "is_hybrid": false
+}
+
+### Test 2 - Créer événement minimal (sans lieu)
+POST {{baseUrl}}/events/create-event
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_type": "séminaire",
+  "title": "Séminaire Entreprise",
+  "event_date": "2024-11-15T09:00:00Z",
+  "guest_count": 50
+}
+
+### Test 3 - Erreur: date dans le passé
+POST {{baseUrl}}/events/create-event
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_type": "concert",
+  "title": "Concert",
+  "event_date": "2020-01-01T18:00:00Z"
+}
+
+### Test 4 - Erreur: titre manquant
+POST {{baseUrl}}/events/create-event
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_type": "mariage",
+  "event_date": "2024-12-25T18:00:00Z"
+}
+
+### Test 5 - Erreur: capacité dépassée
+POST {{baseUrl}}/events/create-event
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_type": "mariage",
+  "title": "Grand Mariage",
+  "event_date": "2024-12-25T18:00:00Z",
+  "venue_id": "venue-uuid-here",
+  "guest_count": 1000
+}
+

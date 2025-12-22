@@ -1,0 +1,63 @@
+### Variables
+@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@authToken = YOUR_JWT_TOKEN_HERE
+
+### Test 1 - Créer une notification pour un utilisateur (cas nominal)
+POST {{baseUrl}}/notifications/create-notification
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "user_id": "user-uuid-here",
+  "event_id": "event-uuid-here",
+  "type": "info",
+  "title": "Nouvelle information",
+  "message": "Votre événement a été mis à jour"
+}
+
+### Test 2 - Créer une notification globale (pour tous les admins)
+POST {{baseUrl}}/notifications/create-notification
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "user_id": null,
+  "type": "system",
+  "title": "Maintenance programmée",
+  "message": "Une maintenance est prévue ce soir à 22h"
+}
+
+### Test 3 - Erreur: type manquant
+POST {{baseUrl}}/notifications/create-notification
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "user_id": "user-uuid-here",
+  "title": "Titre",
+  "message": "Message"
+}
+
+### Test 4 - Erreur: title manquant
+POST {{baseUrl}}/notifications/create-notification
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "user_id": "user-uuid-here",
+  "type": "info",
+  "message": "Message"
+}
+
+### Test 5 - Erreur: accès non autorisé (client)
+POST {{baseUrl}}/notifications/create-notification
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "user_id": "user-uuid-here",
+  "type": "info",
+  "title": "Titre",
+  "message": "Message"
+}
+

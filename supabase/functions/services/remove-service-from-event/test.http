@@ -1,0 +1,47 @@
+### Variables
+@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@authToken = YOUR_JWT_TOKEN_HERE
+
+### Test 1 - Retirer un service d'un événement (cas nominal)
+DELETE {{baseUrl}}/services/remove-service-from-event
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_service_id": "event-service-uuid-here"
+}
+
+### Test 2 - Erreur: event_service_id manquant
+DELETE {{baseUrl}}/services/remove-service-from-event
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{}
+
+### Test 3 - Erreur: service introuvable
+DELETE {{baseUrl}}/services/remove-service-from-event
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_service_id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Test 4 - Erreur: service dans un devis accepté
+DELETE {{baseUrl}}/services/remove-service-from-event
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_service_id": "service-in-accepted-quote-uuid"
+}
+
+### Test 5 - Erreur: événement terminé
+DELETE {{baseUrl}}/services/remove-service-from-event
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_service_id": "event-service-completed-event-uuid"
+}
+

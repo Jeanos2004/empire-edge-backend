@@ -1,0 +1,86 @@
+### Variables
+@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@authToken = YOUR_JWT_TOKEN_HERE
+
+### Test 1 - Ajouter plusieurs invités (cas nominal)
+POST {{baseUrl}}/guests/add-guests
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_id": "event-uuid-here",
+  "guests": [
+    {
+      "first_name": "Jean",
+      "last_name": "Dupont",
+      "email": "jean.dupont@example.com",
+      "phone": "+224612345678",
+      "category": "family",
+      "dietary_restrictions": "Végétarien"
+    },
+    {
+      "first_name": "Marie",
+      "last_name": "Martin",
+      "email": "marie.martin@example.com",
+      "phone": "+224612345679",
+      "category": "friend"
+    }
+  ]
+}
+
+### Test 2 - Ajouter un invité minimal
+POST {{baseUrl}}/guests/add-guests
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_id": "event-uuid-here",
+  "guests": [
+    {
+      "first_name": "Pierre",
+      "last_name": "Durand",
+      "email": "pierre.durand@example.com"
+    }
+  ]
+}
+
+### Test 3 - Erreur: event_id manquant
+POST {{baseUrl}}/guests/add-guests
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "guests": [
+    {
+      "first_name": "Jean",
+      "last_name": "Dupont",
+      "email": "jean@example.com"
+    }
+  ]
+}
+
+### Test 4 - Erreur: invités vides
+POST {{baseUrl}}/guests/add-guests
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_id": "event-uuid-here",
+  "guests": []
+}
+
+### Test 5 - Erreur: invité sans email ni téléphone
+POST {{baseUrl}}/guests/add-guests
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_id": "event-uuid-here",
+  "guests": [
+    {
+      "first_name": "Jean",
+      "last_name": "Dupont"
+    }
+  ]
+}
+

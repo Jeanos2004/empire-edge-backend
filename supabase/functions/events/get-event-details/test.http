@@ -1,0 +1,20 @@
+### Variables
+@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@authToken = YOUR_JWT_TOKEN_HERE
+
+### Test 1 - Récupérer les détails d'un événement (cas nominal)
+GET {{baseUrl}}/events/get-event-details?event_id=event-uuid-here
+Authorization: Bearer {{authToken}}
+
+### Test 2 - Erreur: event_id manquant
+GET {{baseUrl}}/events/get-event-details
+Authorization: Bearer {{authToken}}
+
+### Test 3 - Erreur: événement inexistant
+GET {{baseUrl}}/events/get-event-details?event_id=00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
+
+### Test 4 - Accès non autorisé (client essayant d'accéder à un événement d'un autre client)
+GET {{baseUrl}}/events/get-event-details?event_id=autre-client-event-uuid
+Authorization: Bearer {{authToken}}
+

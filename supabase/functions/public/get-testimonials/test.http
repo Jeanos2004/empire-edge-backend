@@ -1,0 +1,18 @@
+### Variables
+@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+
+### Test 1 - Récupérer tous les témoignages (cas nominal - public)
+GET {{baseUrl}}/public/get-testimonials
+
+### Test 2 - Filtrer par événement
+GET {{baseUrl}}/public/get-testimonials?event_id=event-uuid-here
+
+### Test 3 - Filtrer par note minimum
+GET {{baseUrl}}/public/get-testimonials?min_rating=4
+
+### Test 4 - Limiter le nombre de résultats
+GET {{baseUrl}}/public/get-testimonials?limit=5
+
+### Test 5 - Combinaison de filtres
+GET {{baseUrl}}/public/get-testimonials?event_id=event-uuid-here&min_rating=4&limit=10
+

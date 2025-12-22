@@ -1,0 +1,61 @@
+### Variables
+@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@authToken = YOUR_JWT_TOKEN_HERE
+
+### Test 1 - Ajouter un service à un événement (cas nominal)
+POST {{baseUrl}}/services/add-service-to-event
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_id": "event-uuid-here",
+  "service_id": "service-uuid-here",
+  "provider_id": "provider-uuid-here",
+  "quantity": 1,
+  "unit_price": 2000000,
+  "configuration": {
+    "menu_type": "premium",
+    "guest_count": 150
+  }
+}
+
+### Test 2 - Ajouter un service avec prix par défaut
+POST {{baseUrl}}/services/add-service-to-event
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_id": "event-uuid-here",
+  "service_id": "service-uuid-here",
+  "quantity": 2
+}
+
+### Test 3 - Erreur: event_id manquant
+POST {{baseUrl}}/services/add-service-to-event
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "service_id": "service-uuid-here"
+}
+
+### Test 4 - Erreur: service déjà ajouté
+POST {{baseUrl}}/services/add-service-to-event
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_id": "event-uuid-here",
+  "service_id": "already-added-service-uuid"
+}
+
+### Test 5 - Erreur: service inactif
+POST {{baseUrl}}/services/add-service-to-event
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "event_id": "event-uuid-here",
+  "service_id": "inactive-service-uuid"
+}
+

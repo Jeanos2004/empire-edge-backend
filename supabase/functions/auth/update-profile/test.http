@@ -1,0 +1,59 @@
+### Variables
+@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@authToken = YOUR_JWT_TOKEN_HERE
+
+### Test 1 - Mise à jour complète du profil (cas nominal)
+PUT {{baseUrl}}/auth/update-profile
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "first_name": "Jean",
+  "last_name": "Dupont",
+  "phone": "+224612345678",
+  "company_name": "Nouvelle Entreprise",
+  "address": "456 Nouvelle Rue",
+  "city": "Conakry",
+  "avatar_url": "https://example.com/avatar.jpg"
+}
+
+### Test 2 - Mise à jour partielle (seulement quelques champs)
+PUT {{baseUrl}}/auth/update-profile
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "phone": "+224612345679",
+  "city": "Kindia"
+}
+
+### Test 3 - Mise à jour de l'email
+PUT {{baseUrl}}/auth/update-profile
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "email": "nouveau@example.com"
+}
+
+### Test 4 - Erreur: non authentifié
+PUT {{baseUrl}}/auth/update-profile
+Content-Type: application/json
+
+{
+  "first_name": "Jean"
+}
+
+### Test 5 - Mise à jour avec préférences
+PUT {{baseUrl}}/auth/update-profile
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "preferences": {
+    "language": "fr",
+    "notifications": true,
+    "theme": "dark"
+  }
+}
+

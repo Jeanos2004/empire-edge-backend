@@ -1,0 +1,24 @@
+### Variables
+@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@authToken = YOUR_JWT_TOKEN_HERE
+
+### Test 1 - Récupérer l'historique complet (cas nominal)
+GET {{baseUrl}}/payments/get-payment-history
+Authorization: Bearer {{authToken}}
+
+### Test 2 - Filtrer par événement
+GET {{baseUrl}}/payments/get-payment-history?event_id=event-uuid-here
+Authorization: Bearer {{authToken}}
+
+### Test 3 - Filtrer par statut
+GET {{baseUrl}}/payments/get-payment-history?status=paid
+Authorization: Bearer {{authToken}}
+
+### Test 4 - Pagination
+GET {{baseUrl}}/payments/get-payment-history?page=2&limit=10
+Authorization: Bearer {{authToken}}
+
+### Test 5 - Combinaison de filtres
+GET {{baseUrl}}/payments/get-payment-history?event_id=event-uuid-here&status=pending&page=1&limit=20
+Authorization: Bearer {{authToken}}
+

@@ -1,0 +1,24 @@
+### Variables
+@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@authToken = YOUR_JWT_TOKEN_HERE
+
+### Test 1 - Récupérer tous les invités (cas nominal)
+GET {{baseUrl}}/guests/get-guest-list?event_id=event-uuid-here
+Authorization: Bearer {{authToken}}
+
+### Test 2 - Filtrer par statut RSVP
+GET {{baseUrl}}/guests/get-guest-list?event_id=event-uuid-here&rsvp_status=accepted
+Authorization: Bearer {{authToken}}
+
+### Test 3 - Filtrer par catégorie
+GET {{baseUrl}}/guests/get-guest-list?event_id=event-uuid-here&category=family
+Authorization: Bearer {{authToken}}
+
+### Test 4 - Combinaison de filtres
+GET {{baseUrl}}/guests/get-guest-list?event_id=event-uuid-here&rsvp_status=accepted&category=friend
+Authorization: Bearer {{authToken}}
+
+### Test 5 - Erreur: event_id manquant
+GET {{baseUrl}}/guests/get-guest-list
+Authorization: Bearer {{authToken}}
+

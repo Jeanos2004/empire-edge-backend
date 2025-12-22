@@ -1,0 +1,49 @@
+### Variables
+@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@authToken = YOUR_JWT_TOKEN_HERE
+
+### Test 1 - Confirmer un paiement (cas nominal)
+POST {{baseUrl}}/payments/confirm-payment
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "payment_id": "payment-uuid-here",
+  "payment_method": "mobile_money",
+  "receipt_url": "https://example.com/receipt.pdf"
+}
+
+### Test 2 - Confirmer un paiement minimal
+POST {{baseUrl}}/payments/confirm-payment
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "payment_id": "payment-uuid-here"
+}
+
+### Test 3 - Erreur: payment_id manquant
+POST {{baseUrl}}/payments/confirm-payment
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{}
+
+### Test 4 - Erreur: paiement déjà confirmé
+POST {{baseUrl}}/payments/confirm-payment
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "payment_id": "already-paid-payment-uuid"
+}
+
+### Test 5 - Erreur: paiement annulé
+POST {{baseUrl}}/payments/confirm-payment
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "payment_id": "cancelled-payment-uuid"
+}
+
