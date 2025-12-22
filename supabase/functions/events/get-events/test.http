@@ -1,28 +1,28 @@
 ### Variables
-@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
 @authToken = YOUR_JWT_TOKEN_HERE
 
 ### Test 1 - Récupérer tous les événements (cas nominal)
-GET {{baseUrl}}/events/get-events
+GET {{baseUrl}}/events-get-events
 Authorization: Bearer {{authToken}}
 
 ### Test 2 - Filtrer par statut
-GET {{baseUrl}}/events/get-events?status=draft
+GET {{baseUrl}}/events-get-events?status=draft
 Authorization: Bearer {{authToken}}
 
 ### Test 3 - Filtrer par type d'événement
-GET {{baseUrl}}/events/get-events?event_type=mariage
+GET {{baseUrl}}/events-get-events?event_type=mariage
 Authorization: Bearer {{authToken}}
 
 ### Test 4 - Filtrer par période
-GET {{baseUrl}}/events/get-events?start_date=2024-01-01&end_date=2024-12-31
+GET {{baseUrl}}/events-get-events?start_date=2024-01-01&end_date=2024-12-31
 Authorization: Bearer {{authToken}}
 
 ### Test 5 - Pagination
-GET {{baseUrl}}/events/get-events?page=2&limit=5
+GET {{baseUrl}}/events-get-events?page=2&limit=5
 Authorization: Bearer {{authToken}}
 
 ### Test 6 - Combinaison de filtres
-GET {{baseUrl}}/events/get-events?status=confirmed&event_type=mariage&start_date=2024-06-01
+GET {{baseUrl}}/events-get-events?status=confirmed&event_type=mariage&start_date=2024-06-01
 Authorization: Bearer {{authToken}}
 

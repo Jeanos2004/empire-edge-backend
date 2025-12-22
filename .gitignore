@@ -5,6 +5,7 @@
 # Supabase
 .branches
 .temp
+.supabase-deploy-temp
 
 # Logs
 *.log

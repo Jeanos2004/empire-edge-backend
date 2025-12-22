@@ -1,8 +1,8 @@
 ### Variables
-@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
 
 ### Test 1 - Soumettre un formulaire de contact (cas nominal - public)
-POST {{baseUrl}}/public/submit-contact-form
+POST {{baseUrl}}/public-submit-contact-form
 Content-Type: application/json
 
 {
@@ -13,7 +13,7 @@ Content-Type: application/json
 }
 
 ### Test 2 - Formulaire minimal
-POST {{baseUrl}}/public/submit-contact-form
+POST {{baseUrl}}/public-submit-contact-form
 Content-Type: application/json
 
 {
@@ -23,7 +23,7 @@ Content-Type: application/json
 }
 
 ### Test 3 - Erreur: nom manquant
-POST {{baseUrl}}/public/submit-contact-form
+POST {{baseUrl}}/public-submit-contact-form
 Content-Type: application/json
 
 {
@@ -32,7 +32,7 @@ Content-Type: application/json
 }
 
 ### Test 4 - Erreur: email manquant
-POST {{baseUrl}}/public/submit-contact-form
+POST {{baseUrl}}/public-submit-contact-form
 Content-Type: application/json
 
 {
@@ -41,7 +41,7 @@ Content-Type: application/json
 }
 
 ### Test 5 - Erreur: format email invalide
-POST {{baseUrl}}/public/submit-contact-form
+POST {{baseUrl}}/public-submit-contact-form
 Content-Type: application/json
 
 {

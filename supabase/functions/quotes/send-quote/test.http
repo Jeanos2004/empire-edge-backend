@@ -1,9 +1,9 @@
 ### Variables
-@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
 @authToken = YOUR_JWT_TOKEN_HERE
 
 ### Test 1 - Envoyer un devis (cas nominal)
-POST {{baseUrl}}/quotes/send-quote
+POST {{baseUrl}}/quotes-send-quote
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -12,14 +12,14 @@ Content-Type: application/json
 }
 
 ### Test 2 - Erreur: quote_id manquant
-POST {{baseUrl}}/quotes/send-quote
+POST {{baseUrl}}/quotes-send-quote
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {}
 
 ### Test 3 - Erreur: devis déjà envoyé
-POST {{baseUrl}}/quotes/send-quote
+POST {{baseUrl}}/quotes-send-quote
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -28,7 +28,7 @@ Content-Type: application/json
 }
 
 ### Test 4 - Erreur: devis déjà accepté
-POST {{baseUrl}}/quotes/send-quote
+POST {{baseUrl}}/quotes-send-quote
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -37,7 +37,7 @@ Content-Type: application/json
 }
 
 ### Test 5 - Erreur: accès non autorisé (client)
-POST {{baseUrl}}/quotes/send-quote
+POST {{baseUrl}}/quotes-send-quote
 Authorization: Bearer {{clientToken}}
 Content-Type: application/json
 

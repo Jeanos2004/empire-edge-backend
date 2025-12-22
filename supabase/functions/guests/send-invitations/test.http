@@ -1,9 +1,9 @@
 ### Variables
-@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
 @authToken = YOUR_JWT_TOKEN_HERE
 
 ### Test 1 - Envoyer invitations à tous les invités (cas nominal)
-POST {{baseUrl}}/guests/send-invitations
+POST {{baseUrl}}/guests-send-invitations
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -12,7 +12,7 @@ Content-Type: application/json
 }
 
 ### Test 2 - Envoyer invitations à des invités spécifiques
-POST {{baseUrl}}/guests/send-invitations
+POST {{baseUrl}}/guests-send-invitations
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -22,14 +22,14 @@ Content-Type: application/json
 }
 
 ### Test 3 - Erreur: event_id manquant
-POST {{baseUrl}}/guests/send-invitations
+POST {{baseUrl}}/guests-send-invitations
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {}
 
 ### Test 4 - Erreur: aucun invité trouvé
-POST {{baseUrl}}/guests/send-invitations
+POST {{baseUrl}}/guests-send-invitations
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -38,7 +38,7 @@ Content-Type: application/json
 }
 
 ### Test 5 - Erreur: invités sans contact
-POST {{baseUrl}}/guests/send-invitations
+POST {{baseUrl}}/guests-send-invitations
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 

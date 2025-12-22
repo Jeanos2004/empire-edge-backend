@@ -1,10 +1,10 @@
 ### Variables
-@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
 @authToken = YOUR_JWT_TOKEN_HERE
 @clientToken = CLIENT_JWT_TOKEN_HERE
 
 ### Test 1 - Accepter un devis (cas nominal - client)
-POST {{baseUrl}}/quotes/accept-quote
+POST {{baseUrl}}/quotes-accept-quote
 Authorization: Bearer {{clientToken}}
 Content-Type: application/json
 
@@ -14,7 +14,7 @@ Content-Type: application/json
 }
 
 ### Test 2 - Accepter un devis sans contenu personnalisé
-POST {{baseUrl}}/quotes/accept-quote
+POST {{baseUrl}}/quotes-accept-quote
 Authorization: Bearer {{clientToken}}
 Content-Type: application/json
 
@@ -23,14 +23,14 @@ Content-Type: application/json
 }
 
 ### Test 3 - Erreur: quote_id manquant
-POST {{baseUrl}}/quotes/accept-quote
+POST {{baseUrl}}/quotes-accept-quote
 Authorization: Bearer {{clientToken}}
 Content-Type: application/json
 
 {}
 
 ### Test 4 - Erreur: devis déjà accepté
-POST {{baseUrl}}/quotes/accept-quote
+POST {{baseUrl}}/quotes-accept-quote
 Authorization: Bearer {{clientToken}}
 Content-Type: application/json
 
@@ -39,7 +39,7 @@ Content-Type: application/json
 }
 
 ### Test 5 - Erreur: devis expiré
-POST {{baseUrl}}/quotes/accept-quote
+POST {{baseUrl}}/quotes-accept-quote
 Authorization: Bearer {{clientToken}}
 Content-Type: application/json
 
@@ -48,7 +48,7 @@ Content-Type: application/json
 }
 
 ### Test 6 - Erreur: accès non autorisé
-POST {{baseUrl}}/quotes/accept-quote
+POST {{baseUrl}}/quotes-accept-quote
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 

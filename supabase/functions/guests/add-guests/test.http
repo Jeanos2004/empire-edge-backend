@@ -1,9 +1,9 @@
 ### Variables
-@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
 @authToken = YOUR_JWT_TOKEN_HERE
 
 ### Test 1 - Ajouter plusieurs invités (cas nominal)
-POST {{baseUrl}}/guests/add-guests
+POST {{baseUrl}}/guests-add-guests
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -29,7 +29,7 @@ Content-Type: application/json
 }
 
 ### Test 2 - Ajouter un invité minimal
-POST {{baseUrl}}/guests/add-guests
+POST {{baseUrl}}/guests-add-guests
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -45,7 +45,7 @@ Content-Type: application/json
 }
 
 ### Test 3 - Erreur: event_id manquant
-POST {{baseUrl}}/guests/add-guests
+POST {{baseUrl}}/guests-add-guests
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -60,7 +60,7 @@ Content-Type: application/json
 }
 
 ### Test 4 - Erreur: invités vides
-POST {{baseUrl}}/guests/add-guests
+POST {{baseUrl}}/guests-add-guests
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -70,7 +70,7 @@ Content-Type: application/json
 }
 
 ### Test 5 - Erreur: invité sans email ni téléphone
-POST {{baseUrl}}/guests/add-guests
+POST {{baseUrl}}/guests-add-guests
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 

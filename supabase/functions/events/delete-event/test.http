@@ -1,9 +1,9 @@
 ### Variables
-@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
 @authToken = YOUR_JWT_TOKEN_HERE
 
 ### Test 1 - Supprimer événement (cas nominal)
-DELETE {{baseUrl}}/events/delete-event
+DELETE {{baseUrl}}/events-delete-event
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -12,14 +12,14 @@ Content-Type: application/json
 }
 
 ### Test 2 - Erreur: event_id manquant
-DELETE {{baseUrl}}/events/delete-event
+DELETE {{baseUrl}}/events-delete-event
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {}
 
 ### Test 3 - Erreur: événement avec devis accepté
-DELETE {{baseUrl}}/events/delete-event
+DELETE {{baseUrl}}/events-delete-event
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -28,7 +28,7 @@ Content-Type: application/json
 }
 
 ### Test 4 - Erreur: événement avec paiements
-DELETE {{baseUrl}}/events/delete-event
+DELETE {{baseUrl}}/events-delete-event
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -37,7 +37,7 @@ Content-Type: application/json
 }
 
 ### Test 5 - Erreur: accès non autorisé
-DELETE {{baseUrl}}/events/delete-event
+DELETE {{baseUrl}}/events-delete-event
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 

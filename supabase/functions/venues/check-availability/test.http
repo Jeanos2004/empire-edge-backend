@@ -1,24 +1,24 @@
 ### Variables
-@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
 @authToken = YOUR_JWT_TOKEN_HERE
 
 ### Test 1 - Vérifier disponibilité (cas nominal)
-GET {{baseUrl}}/venues/check-availability?venue_id=venue-uuid-here&date=2024-12-25
+GET {{baseUrl}}/venues-check-availability?venue_id=venue-uuid-here&date=2024-12-25
 Authorization: Bearer {{authToken}}
 
 ### Test 2 - Vérifier disponibilité avec date complète
-GET {{baseUrl}}/venues/check-availability?venue_id=venue-uuid-here&date=2024-12-25T18:00:00Z
+GET {{baseUrl}}/venues-check-availability?venue_id=venue-uuid-here&date=2024-12-25T18:00:00Z
 Authorization: Bearer {{authToken}}
 
 ### Test 3 - Erreur: venue_id manquant
-GET {{baseUrl}}/venues/check-availability?date=2024-12-25
+GET {{baseUrl}}/venues-check-availability?date=2024-12-25
 Authorization: Bearer {{authToken}}
 
 ### Test 4 - Erreur: date manquante
-GET {{baseUrl}}/venues/check-availability?venue_id=venue-uuid-here
+GET {{baseUrl}}/venues-check-availability?venue_id=venue-uuid-here
 Authorization: Bearer {{authToken}}
 
 ### Test 5 - Lieu non disponible
-GET {{baseUrl}}/venues/check-availability?venue_id=unavailable-venue-uuid&date=2024-12-25
+GET {{baseUrl}}/venues-check-availability?venue_id=unavailable-venue-uuid&date=2024-12-25
 Authorization: Bearer {{authToken}}
 

@@ -1,24 +1,24 @@
 ### Variables
-@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
 @authToken = YOUR_JWT_TOKEN_HERE
 
 ### Test 1 - Récupérer tous les lieux disponibles (cas nominal)
-GET {{baseUrl}}/venues/get-venues
+GET {{baseUrl}}/venues-get-venues
 Authorization: Bearer {{authToken}}
 
 ### Test 2 - Filtrer par ville
-GET {{baseUrl}}/venues/get-venues?city=Conakry
+GET {{baseUrl}}/venues-get-venues?city=Conakry
 Authorization: Bearer {{authToken}}
 
 ### Test 3 - Filtrer par capacité
-GET {{baseUrl}}/venues/get-venues?min_capacity=100&max_capacity=500
+GET {{baseUrl}}/venues-get-venues?min_capacity=100&max_capacity=500
 Authorization: Bearer {{authToken}}
 
 ### Test 4 - Filtrer par disponibilité pour une date
-GET {{baseUrl}}/venues/get-venues?date=2024-12-25
+GET {{baseUrl}}/venues-get-venues?date=2024-12-25
 Authorization: Bearer {{authToken}}
 
 ### Test 5 - Combinaison de filtres
-GET {{baseUrl}}/venues/get-venues?city=Conakry&min_capacity=200&date=2024-12-25&page=1&limit=10
+GET {{baseUrl}}/venues-get-venues?city=Conakry&min_capacity=200&date=2024-12-25&page=1&limit=10
 Authorization: Bearer {{authToken}}
 

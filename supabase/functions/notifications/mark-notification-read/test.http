@@ -1,9 +1,9 @@
 ### Variables
-@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
 @authToken = YOUR_JWT_TOKEN_HERE
 
 ### Test 1 - Marquer une notification comme lue (cas nominal)
-POST {{baseUrl}}/notifications/mark-notification-read
+POST {{baseUrl}}/notifications-mark-notification-read
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -12,7 +12,7 @@ Content-Type: application/json
 }
 
 ### Test 2 - Marquer plusieurs notifications comme lues
-POST {{baseUrl}}/notifications/mark-notification-read
+POST {{baseUrl}}/notifications-mark-notification-read
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -21,7 +21,7 @@ Content-Type: application/json
 }
 
 ### Test 3 - Erreur: notification_id et notification_ids manquants
-POST {{baseUrl}}/notifications/mark-notification-read
+POST {{baseUrl}}/notifications-mark-notification-read
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 

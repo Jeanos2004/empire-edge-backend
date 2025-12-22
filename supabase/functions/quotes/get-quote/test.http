@@ -1,24 +1,24 @@
 ### Variables
-@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
 @authToken = YOUR_JWT_TOKEN_HERE
 
 ### Test 1 - Récupérer un devis par ID (cas nominal)
-GET {{baseUrl}}/quotes/get-quote?quote_id=quote-uuid-here
+GET {{baseUrl}}/quotes-get-quote?quote_id=quote-uuid-here
 Authorization: Bearer {{authToken}}
 
 ### Test 2 - Récupérer tous les devis d'un événement
-GET {{baseUrl}}/quotes/get-quote?event_id=event-uuid-here
+GET {{baseUrl}}/quotes-get-quote?event_id=event-uuid-here
 Authorization: Bearer {{authToken}}
 
 ### Test 3 - Erreur: paramètres manquants
-GET {{baseUrl}}/quotes/get-quote
+GET {{baseUrl}}/quotes-get-quote
 Authorization: Bearer {{authToken}}
 
 ### Test 4 - Erreur: devis inexistant
-GET {{baseUrl}}/quotes/get-quote?quote_id=00000000-0000-0000-0000-000000000000
+GET {{baseUrl}}/quotes-get-quote?quote_id=00000000-0000-0000-0000-000000000000
 Authorization: Bearer {{authToken}}
 
 ### Test 5 - Client essayant d'accéder à un devis d'un autre client
-GET {{baseUrl}}/quotes/get-quote?quote_id=autre-client-quote-uuid
+GET {{baseUrl}}/quotes-get-quote?quote_id=autre-client-quote-uuid
 Authorization: Bearer {{authToken}}
 

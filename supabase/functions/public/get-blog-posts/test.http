@@ -1,18 +1,18 @@
 ### Variables
-@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
 
 ### Test 1 - Récupérer tous les articles (cas nominal - public)
-GET {{baseUrl}}/public/get-blog-posts
+GET {{baseUrl}}/public-get-blog-posts
 
 ### Test 2 - Filtrer par catégorie
-GET {{baseUrl}}/public/get-blog-posts?category=evenements
+GET {{baseUrl}}/public-get-blog-posts?category=evenements
 
 ### Test 3 - Filtrer par tag
-GET {{baseUrl}}/public/get-blog-posts?tag=mariage
+GET {{baseUrl}}/public-get-blog-posts?tag=mariage
 
 ### Test 4 - Pagination
-GET {{baseUrl}}/public/get-blog-posts?page=2&limit=5
+GET {{baseUrl}}/public-get-blog-posts?page=2&limit=5
 
 ### Test 5 - Combinaison de filtres
-GET {{baseUrl}}/public/get-blog-posts?category=evenements&tag=mariage&page=1&limit=10
+GET {{baseUrl}}/public-get-blog-posts?category=evenements&tag=mariage&page=1&limit=10
 

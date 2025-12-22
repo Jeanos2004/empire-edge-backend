@@ -1,28 +1,28 @@
 ### Variables
-@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
 @authToken = YOUR_JWT_TOKEN_HERE
 
 ### Test 1 - Récupérer tous les messages (cas nominal)
-GET {{baseUrl}}/messages/get-messages
+GET {{baseUrl}}/messages-get-messages
 Authorization: Bearer {{authToken}}
 
 ### Test 2 - Filtrer par événement
-GET {{baseUrl}}/messages/get-messages?event_id=event-uuid-here
+GET {{baseUrl}}/messages-get-messages?event_id=event-uuid-here
 Authorization: Bearer {{authToken}}
 
 ### Test 3 - Filtrer par conversation avec un utilisateur
-GET {{baseUrl}}/messages/get-messages?other_user_id=user-uuid-here
+GET {{baseUrl}}/messages-get-messages?other_user_id=user-uuid-here
 Authorization: Bearer {{authToken}}
 
 ### Test 4 - Filtrer les messages non lus
-GET {{baseUrl}}/messages/get-messages?is_read=false
+GET {{baseUrl}}/messages-get-messages?is_read=false
 Authorization: Bearer {{authToken}}
 
 ### Test 5 - Pagination
-GET {{baseUrl}}/messages/get-messages?page=2&limit=20
+GET {{baseUrl}}/messages-get-messages?page=2&limit=20
 Authorization: Bearer {{authToken}}
 
 ### Test 6 - Combinaison de filtres
-GET {{baseUrl}}/messages/get-messages?event_id=event-uuid-here&is_read=false&page=1&limit=10
+GET {{baseUrl}}/messages-get-messages?event_id=event-uuid-here&is_read=false&page=1&limit=10
 Authorization: Bearer {{authToken}}
 

@@ -1,9 +1,9 @@
 ### Variables
-@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
 @authToken = YOUR_JWT_TOKEN_HERE
 
 ### Test 1 - Générer une facture depuis un devis (cas nominal)
-POST {{baseUrl}}/admin/generate-invoice
+POST {{baseUrl}}/admin-generate-invoice
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -12,7 +12,7 @@ Content-Type: application/json
 }
 
 ### Test 2 - Générer une facture depuis un événement
-POST {{baseUrl}}/admin/generate-invoice
+POST {{baseUrl}}/admin-generate-invoice
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -21,14 +21,14 @@ Content-Type: application/json
 }
 
 ### Test 3 - Erreur: paramètres manquants
-POST {{baseUrl}}/admin/generate-invoice
+POST {{baseUrl}}/admin-generate-invoice
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {}
 
 ### Test 4 - Erreur: événement sans devis accepté
-POST {{baseUrl}}/admin/generate-invoice
+POST {{baseUrl}}/admin-generate-invoice
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -37,7 +37,7 @@ Content-Type: application/json
 }
 
 ### Test 5 - Erreur: accès non autorisé
-POST {{baseUrl}}/admin/generate-invoice
+POST {{baseUrl}}/admin-generate-invoice
 Authorization: Bearer {{clientToken}}
 Content-Type: application/json
 

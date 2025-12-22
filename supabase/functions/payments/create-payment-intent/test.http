@@ -1,9 +1,9 @@
 ### Variables
-@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
 @authToken = YOUR_JWT_TOKEN_HERE
 
 ### Test 1 - Créer une intention de paiement (cas nominal)
-POST {{baseUrl}}/payments/create-payment-intent
+POST {{baseUrl}}/payments-create-payment-intent
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -16,7 +16,7 @@ Content-Type: application/json
 }
 
 ### Test 2 - Créer une intention de paiement complète
-POST {{baseUrl}}/payments/create-payment-intent
+POST {{baseUrl}}/payments-create-payment-intent
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -28,7 +28,7 @@ Content-Type: application/json
 }
 
 ### Test 3 - Erreur: event_id manquant
-POST {{baseUrl}}/payments/create-payment-intent
+POST {{baseUrl}}/payments-create-payment-intent
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -37,7 +37,7 @@ Content-Type: application/json
 }
 
 ### Test 4 - Erreur: amount invalide
-POST {{baseUrl}}/payments/create-payment-intent
+POST {{baseUrl}}/payments-create-payment-intent
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -47,7 +47,7 @@ Content-Type: application/json
 }
 
 ### Test 5 - Erreur: amount manquant
-POST {{baseUrl}}/payments/create-payment-intent
+POST {{baseUrl}}/payments-create-payment-intent
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 

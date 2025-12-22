@@ -1,10 +1,10 @@
 ### Variables
-@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
 @authToken = YOUR_JWT_TOKEN_HERE
 @clientToken = CLIENT_JWT_TOKEN_HERE
 
 ### Test 1 - Rejeter un devis avec raison (cas nominal)
-POST {{baseUrl}}/quotes/reject-quote
+POST {{baseUrl}}/quotes-reject-quote
 Authorization: Bearer {{clientToken}}
 Content-Type: application/json
 
@@ -14,7 +14,7 @@ Content-Type: application/json
 }
 
 ### Test 2 - Rejeter un devis sans raison
-POST {{baseUrl}}/quotes/reject-quote
+POST {{baseUrl}}/quotes-reject-quote
 Authorization: Bearer {{clientToken}}
 Content-Type: application/json
 
@@ -23,14 +23,14 @@ Content-Type: application/json
 }
 
 ### Test 3 - Erreur: quote_id manquant
-POST {{baseUrl}}/quotes/reject-quote
+POST {{baseUrl}}/quotes-reject-quote
 Authorization: Bearer {{clientToken}}
 Content-Type: application/json
 
 {}
 
 ### Test 4 - Erreur: devis déjà accepté
-POST {{baseUrl}}/quotes/reject-quote
+POST {{baseUrl}}/quotes-reject-quote
 Authorization: Bearer {{clientToken}}
 Content-Type: application/json
 
@@ -39,7 +39,7 @@ Content-Type: application/json
 }
 
 ### Test 5 - Erreur: devis déjà rejeté
-POST {{baseUrl}}/quotes/reject-quote
+POST {{baseUrl}}/quotes-reject-quote
 Authorization: Bearer {{clientToken}}
 Content-Type: application/json
 

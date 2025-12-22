@@ -1,24 +1,24 @@
 ### Variables
-@baseUrl = https://YOUR_PROJECT_REF.supabase.co/functions/v1
+@baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
 @authToken = YOUR_JWT_TOKEN_HERE
 
 ### Test 1 - Récupérer tous les services actifs (cas nominal)
-GET {{baseUrl}}/services/get-services
+GET {{baseUrl}}/services-get-services
 Authorization: Bearer {{authToken}}
 
 ### Test 2 - Filtrer par type de service
-GET {{baseUrl}}/services/get-services?service_type=traiteur
+GET {{baseUrl}}/services-get-services?service_type=traiteur
 Authorization: Bearer {{authToken}}
 
 ### Test 3 - Récupérer tous les services (actifs et inactifs)
-GET {{baseUrl}}/services/get-services?is_active=false
+GET {{baseUrl}}/services-get-services?is_active=false
 Authorization: Bearer {{authToken}}
 
 ### Test 4 - Pagination
-GET {{baseUrl}}/services/get-services?page=2&limit=10
+GET {{baseUrl}}/services-get-services?page=2&limit=10
 Authorization: Bearer {{authToken}}
 
 ### Test 5 - Combinaison de filtres
-GET {{baseUrl}}/services/get-services?service_type=decoration&is_active=true&page=1&limit=20
+GET {{baseUrl}}/services-get-services?service_type=decoration&is_active=true&page=1&limit=20
 Authorization: Bearer {{authToken}}
 
