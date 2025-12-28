@@ -1,0 +1,12 @@
+### ============================================
+### SERVICES DELETE SERVICE
+### ============================================
+
+### Test
+POST {baseUrl}/services-delete-service
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

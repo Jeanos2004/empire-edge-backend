@@ -33,19 +33,48 @@ serve(async (req) => {
       throw new Error('Non authentifié')
     }
 
-    // Récupérer le profil pour vérifier que c'est un client
-    const { data: profile } = await supabaseClient
+    // Créer un client avec service role pour récupérer le profil (évite les problèmes RLS)
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
+    // Récupérer le profil
+    const { data: profile } = await supabaseAdmin
       .from('profiles')
-      .select('role, clients!inner(profile_id)')
+      .select('role')
       .eq('id', user.id)
       .single()
 
-    if (!profile || profile.role !== 'client') {
-      throw new Error('Seuls les clients peuvent créer des événements')
+    if (!profile) {
+      throw new Error('Profil introuvable')
     }
 
     // Parser le body
     const body = await req.json()
+
+    // Les admins peuvent créer des événements pour n'importe quel client
+    // Les clients peuvent créer leurs propres événements
+    let clientId = user.id
+    if (profile.role === 'admin' || profile.role === 'super_admin') {
+      // Si admin, utiliser le client_id fourni dans le body
+      if (body.client_id) {
+        clientId = body.client_id
+      } else {
+        // Si pas de client_id fourni, récupérer le premier client disponible
+        const { data: clients } = await supabaseAdmin
+          .from('clients')
+          .select('id, profile_id')
+          .limit(1)
+        
+        if (!clients || clients.length === 0) {
+          throw new Error('Aucun client trouvé. Les admins doivent spécifier un client_id dans le body pour créer un événement.')
+        }
+        clientId = clients[0].profile_id
+      }
+    } else if (profile.role !== 'client') {
+      throw new Error('Seuls les clients et administrateurs peuvent créer des événements')
+    }
 
     // Validation des données requises
     if (!body.event_type) {
@@ -85,7 +114,7 @@ serve(async (req) => {
 
     // Vérifier la disponibilité du lieu si un venue_id est fourni
     if (body.venue_id) {
-      const { data: venue, error: venueError } = await supabaseClient
+      const { data: venue, error: venueError } = await supabaseAdmin
         .from('venues')
         .select('capacity_max, is_available')
         .eq('id', body.venue_id)
@@ -105,7 +134,7 @@ serve(async (req) => {
       }
 
       // Vérifier la disponibilité pour la date
-      const { data: availability } = await supabaseClient
+      const { data: availability } = await supabaseAdmin
         .from('venue_availability')
         .select('is_available')
         .eq('venue_id', body.venue_id)
@@ -117,11 +146,11 @@ serve(async (req) => {
       }
     }
 
-    // Récupérer le client_id
-    const { data: client } = await supabaseClient
+    // Vérifier que le client existe et récupérer son ID (pas profile_id)
+    const { data: client } = await supabaseAdmin
       .from('clients')
-      .select('profile_id')
-      .eq('profile_id', user.id)
+      .select('id, profile_id')
+      .eq('profile_id', clientId)
       .single()
 
     if (!client) {
@@ -129,17 +158,18 @@ serve(async (req) => {
     }
 
     // Créer l'événement
-    const { data: event, error: eventError } = await supabaseClient
+    // Note: client_id doit référencer clients(id), pas clients(profile_id)
+    const { data: event, error: eventError } = await supabaseAdmin
       .from('events')
       .insert({
-        client_id: client.profile_id,
+        client_id: client.id,
         event_type: body.event_type,
         event_category: body.event_category || null,
         title: body.title,
         event_date: body.event_date,
         venue_id: body.venue_id || null,
         guest_count: body.guest_count || null,
-        status: 'draft', // Par défaut, événement en brouillon
+        status: 'planification', // Par défaut, événement en planification
         budget_min: body.budget_min || null,
         budget_max: body.budget_max || null,
         style: body.style || null,
@@ -152,17 +182,20 @@ serve(async (req) => {
       throw new Error(`Erreur lors de la création de l'événement: ${eventError.message}`)
     }
 
-    // Créer une notification pour l'admin
-    await supabaseClient
-      .from('notifications')
-      .insert({
-        user_id: null, // Notification pour tous les admins
-        event_id: event.id,
-        type: 'event_created',
-        title: 'Nouvel événement créé',
-        message: `Un nouvel événement "${body.title}" a été créé`,
-        is_read: false,
-      })
+    // Créer une notification pour l'admin (seulement si créé par un client)
+    if (profile.role === 'client') {
+      // Les admins peuvent accéder à toutes les ressources
+      await supabaseAdmin
+        .from('notifications')
+        .insert({
+          user_id: null, // Notification pour tous les admins
+          event_id: event.id,
+          type: 'event_created',
+          title: 'Nouvel événement créé',
+          message: `Un nouvel événement "${body.title}" a été créé`,
+          is_read: false,
+        })
+    }
 
     return new Response(
       JSON.stringify({

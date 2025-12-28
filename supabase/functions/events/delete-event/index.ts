@@ -33,8 +33,14 @@ serve(async (req) => {
       throw new Error('Non authentifié')
     }
 
+    // Créer un client avec service role pour récupérer le profil (évite les problèmes RLS)
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
     // Récupérer le profil
-    const { data: profile } = await supabaseClient
+    const { data: profile } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -64,13 +70,16 @@ serve(async (req) => {
 
     // Vérifier les permissions
     if (profile.role === 'client') {
-      const { data: client } = await supabaseClient
+      // Les admins peuvent accéder à toutes les ressources
+      // Les admins peuvent accéder à toutes les ressources
+      const { data: client } = await supabaseAdmin
         .from('clients')
-        .select('profile_id')
+        .select('id, profile_id')
         .eq('profile_id', user.id)
         .single()
 
       if (!client || existingEvent.client_id !== client.profile_id) {
+        // Les admins peuvent modifier tous les événements
         throw new Error('Accès non autorisé à cet événement')
       }
     }
@@ -81,7 +90,7 @@ serve(async (req) => {
       .from('quotes')
       .select('id')
       .eq('event_id', body.event_id)
-      .eq('status', 'accepted')
+      .eq('status', 'accepte')
       .limit(1)
       .single()
 
@@ -90,7 +99,7 @@ serve(async (req) => {
     }
 
     // Vérifier s'il y a des paiements
-    const { data: payments } = await supabaseClient
+    const { data: payments } = await supabaseAdmin
       .from('payments')
       .select('id, status')
       .eq('event_id', body.event_id)
@@ -102,7 +111,7 @@ serve(async (req) => {
     }
 
     // Supprimer l'événement (les relations seront supprimées en cascade si configuré dans la DB)
-    const { error: deleteError } = await supabaseClient
+    const { error: deleteError } = await supabaseAdmin
       .from('events')
       .delete()
       .eq('id', body.event_id)

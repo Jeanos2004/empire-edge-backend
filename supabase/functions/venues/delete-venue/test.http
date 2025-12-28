@@ -1,0 +1,12 @@
+### ============================================
+### VENUES DELETE VENUE
+### ============================================
+
+### Test
+POST {baseUrl}/venues-delete-venue
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

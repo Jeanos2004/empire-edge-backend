@@ -1,0 +1,16 @@
+### ============================================
+### USERS - GET ALL USERS (Admin uniquement)
+### ============================================
+
+### Récupérer tous les utilisateurs
+GET {{baseUrl}}/users-get-users?page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### Filtrer par rôle
+GET {{baseUrl}}/users-get-users?role=client&page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### Rechercher un utilisateur
+GET {{baseUrl}}/users-get-users?search=Jean&page=1&limit=20
+Authorization: Bearer {{adminToken}}
+

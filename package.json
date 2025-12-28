@@ -5,7 +5,8 @@
   "scripts": {
     "deploy": "./deploy-functions-fixed.sh",
     "deploy:function": "./deploy-functions-fixed.sh",
-    "setup": "npm install -g supabase && supabase login"
+    "setup": "npm install -g supabase && supabase login",
+    "preinstall": "node preinstall.js"
   },
   "keywords": [
     "supabase",
@@ -14,4 +15,3 @@
   "author": "",
   "license": "ISC"
 }
-

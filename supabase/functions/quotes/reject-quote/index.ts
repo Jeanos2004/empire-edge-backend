@@ -33,15 +33,21 @@ serve(async (req) => {
       throw new Error('Non authentifié')
     }
 
+    // Créer un client avec service role pour récupérer le profil (évite les problèmes RLS)
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
     // Récupérer le profil
-    const { data: profile } = await supabaseClient
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single()
 
-    if (!profile) {
-      throw new Error('Profil introuvable')
+    if (profileError || !profile) {
+      throw new Error(`Profil introuvable: ${profileError?.message || 'Profil non trouvé'}`)
     }
 
     // Parser le body
@@ -51,8 +57,8 @@ serve(async (req) => {
       throw new Error('quote_id est requis')
     }
 
-    // Vérifier que le devis existe
-    const { data: quote, error: quoteError } = await supabaseClient
+    // Vérifier que le devis existe (utiliser supabaseAdmin pour éviter RLS)
+    const { data: quote, error: quoteError } = await supabaseAdmin
       .from('quotes')
       .select(`
         *,
@@ -65,36 +71,36 @@ serve(async (req) => {
       .single()
 
     if (quoteError || !quote) {
-      throw new Error('Devis introuvable')
+      throw new Error(`Devis introuvable: ${quoteError?.message || 'Devis non trouvé'}`)
     }
 
-    // Vérifier les permissions (seul le client propriétaire peut rejeter)
+    // Vérifier les permissions (seul le client propriétaire peut rejeter, ou les admins)
     if (profile.role === 'client') {
-      const { data: client } = await supabaseClient
+      const { data: client } = await supabaseAdmin
         .from('clients')
-        .select('profile_id')
+        .select('id, profile_id')
         .eq('profile_id', user.id)
         .single()
 
-      if (!client || quote.events.client_id !== client.profile_id) {
+      if (!client || quote.events.client_id !== client.id) {
         throw new Error('Accès non autorisé à ce devis')
       }
     }
 
     // Vérifier que le devis peut être rejeté
-    if (quote.status === 'accepted') {
+    if (quote.status === 'accepte') {
       throw new Error('Impossible de rejeter un devis déjà accepté')
     }
 
-    if (quote.status === 'rejected') {
+    if (quote.status === 'refuse') {
       throw new Error('Ce devis a déjà été rejeté')
     }
 
-    // Mettre à jour le devis
-    const { data: updatedQuote, error: updateError } = await supabaseClient
+    // Mettre à jour le devis (utiliser supabaseAdmin pour éviter RLS)
+    const { data: updatedQuote, error: updateError } = await supabaseAdmin
       .from('quotes')
       .update({
-        status: 'rejected',
+        status: 'refuse',
         rejected_at: new Date().toISOString(),
         rejection_reason: body.reason || null,
       })
@@ -106,8 +112,8 @@ serve(async (req) => {
       throw new Error(`Erreur lors du rejet du devis: ${updateError.message}`)
     }
 
-    // Créer une notification pour l'admin
-    await supabaseClient
+    // Créer une notification pour l'admin (utiliser supabaseAdmin)
+    await supabaseAdmin
       .from('notifications')
       .insert({
         user_id: null, // Notification pour tous les admins

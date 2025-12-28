@@ -33,15 +33,21 @@ serve(async (req) => {
       throw new Error('Non authentifié')
     }
 
+    // Créer un client avec service role pour récupérer le profil (évite les problèmes RLS)
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
     // Récupérer le profil
-    const { data: profile } = await supabaseClient
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single()
 
-    if (!profile) {
-      throw new Error('Profil introuvable')
+    if (profileError || !profile) {
+      throw new Error(`Profil introuvable: ${profileError?.message || 'Profil non trouvé'}`)
     }
 
     // Seuls les admins peuvent accéder aux stats
@@ -63,86 +69,59 @@ serve(async (req) => {
       dateFilter = { ...dateFilter, lte: endDate }
     }
 
-    // Récupérer les statistiques
-    const stats: any = {}
+    // Utiliser la vue admin_dashboard_stats
+    const { data: stats, error: statsError } = await supabaseAdmin
+      .from('admin_dashboard_stats')
+      .select('*')
+      .single()
 
-    // Nombre total d'événements
-    let eventsQuery = supabaseClient.from('events').select('*', { count: 'exact', head: true })
-    if (startDate || endDate) {
-      eventsQuery = eventsQuery.gte('created_at', startDate || '1900-01-01').lte('created_at', endDate || '2100-12-31')
+    if (statsError) {
+      // Si la vue n'existe pas, calculer manuellement
+      const { data: events } = await supabaseAdmin
+        .from('events')
+        .select('id, status, event_date', { count: 'exact' })
+
+      const { data: quotes } = await supabaseAdmin
+        .from('quotes')
+        .select('id, status', { count: 'exact' })
+
+      const { data: payments } = await supabaseAdmin
+        .from('payments')
+        .select('amount, status', { count: 'exact' })
+
+      const { data: clients } = await supabaseAdmin
+        .from('clients')
+        .select('id', { count: 'exact' })
+
+      const totalEvents = events?.length || 0
+      const upcomingEvents = events?.filter(e => new Date(e.event_date) >= new Date()).length || 0
+      const completedEvents = events?.filter(e => e.status === 'termine').length || 0
+      const totalQuotes = quotes?.length || 0
+      const pendingQuotes = quotes?.filter(q => q.status === 'en_attente').length || 0
+      const acceptedQuotes = quotes?.filter(q => q.status === 'accepte').length || 0
+      const totalRevenue = payments?.filter(p => p.status === 'paye').reduce((sum, p) => sum + (p.amount || 0), 0) || 0
+      const totalClients = clients?.length || 0
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          data: {
+            total_events: totalEvents,
+            upcoming_events: upcomingEvents,
+            completed_events: completedEvents,
+            total_quotes: totalQuotes,
+            pending_quotes: pendingQuotes,
+            accepted_quotes: acceptedQuotes,
+            total_revenue: totalRevenue,
+            total_clients: totalClients,
+          }
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        },
+      )
     }
-    const { count: totalEvents } = await eventsQuery
-
-    // Événements par statut
-    const { data: eventsByStatus } = await supabaseClient
-      .from('events')
-      .select('status')
-    
-    const statusCounts: any = {}
-    eventsByStatus?.forEach((event: any) => {
-      statusCounts[event.status] = (statusCounts[event.status] || 0) + 1
-    })
-
-    // Nombre total de clients
-    const { count: totalClients } = await supabaseClient
-      .from('clients')
-      .select('*', { count: 'exact', head: true })
-
-    // Nombre total de devis
-    let quotesQuery = supabaseClient.from('quotes').select('*', { count: 'exact', head: true })
-    if (startDate || endDate) {
-      quotesQuery = quotesQuery.gte('created_at', startDate || '1900-01-01').lte('created_at', endDate || '2100-12-31')
-    }
-    const { count: totalQuotes } = await quotesQuery
-
-    // Devis par statut
-    const { data: quotesByStatus } = await supabaseClient
-      .from('quotes')
-      .select('status')
-    
-    const quoteStatusCounts: any = {}
-    quotesByStatus?.forEach((quote: any) => {
-      quoteStatusCounts[quote.status] = (quoteStatusCounts[quote.status] || 0) + 1
-    })
-
-    // Revenus (paiements payés)
-    const { data: payments } = await supabaseClient
-      .from('payments')
-      .select('amount')
-      .eq('status', 'paid')
-    
-    if (startDate || endDate) {
-      // Filtrer par date de paiement
-      // Note: Cette logique devrait être ajustée selon votre schéma
-    }
-
-    const totalRevenue = payments?.reduce((sum: number, payment: any) => sum + (payment.amount || 0), 0) || 0
-
-    // Paiements en attente
-    const { data: pendingPayments } = await supabaseClient
-      .from('payments')
-      .select('amount')
-      .eq('status', 'pending')
-    
-    const pendingRevenue = pendingPayments?.reduce((sum: number, payment: any) => sum + (payment.amount || 0), 0) || 0
-
-    // Événements à venir (prochains 30 jours)
-    const thirtyDaysFromNow = new Date()
-    thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
-    const { count: upcomingEvents } = await supabaseClient
-      .from('events')
-      .select('*', { count: 'exact', head: true })
-      .gte('event_date', new Date().toISOString())
-      .lte('event_date', thirtyDaysFromNow.toISOString())
-
-    stats.total_events = totalEvents || 0
-    stats.events_by_status = statusCounts
-    stats.total_clients = totalClients || 0
-    stats.total_quotes = totalQuotes || 0
-    stats.quotes_by_status = quoteStatusCounts
-    stats.total_revenue = totalRevenue
-    stats.pending_revenue = pendingRevenue
-    stats.upcoming_events = upcomingEvents || 0
 
     return new Response(
       JSON.stringify({
@@ -167,4 +146,3 @@ serve(async (req) => {
     )
   }
 })
-

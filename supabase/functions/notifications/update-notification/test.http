@@ -1,0 +1,12 @@
+### ============================================
+### NOTIFICATIONS UPDATE NOTIFICATION
+### ============================================
+
+### Test
+POST {baseUrl}/notifications-update-notification
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

@@ -1,0 +1,12 @@
+### ============================================
+### MESSAGES GET MESSAGE
+### ============================================
+
+### Test
+GET {baseUrl}/messages-get-message
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

@@ -1,0 +1,24 @@
+### ============================================
+### AUTH - GET CURRENT USER PROFILE
+### ============================================
+
+### Récupérer le profil de l'utilisateur connecté
+GET {{baseUrl}}/auth-me
+Authorization: Bearer {{token}}
+
+### ============================================
+### Scénarios de test
+### ============================================
+
+### Test 1: Récupérer le profil avec token valide
+# @name getProfile
+GET {{baseUrl}}/auth-me
+Authorization: Bearer {{token}}
+
+### Test 2: Tentative sans token (doit échouer)
+GET {{baseUrl}}/auth-me
+
+### Test 3: Tentative avec token invalide (doit échouer)
+GET {{baseUrl}}/auth-me
+Authorization: Bearer invalid_token_here
+

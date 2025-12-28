@@ -1,0 +1,14 @@
+### ============================================
+### USERS - CHANGE USER ROLE (Admin uniquement)
+### ============================================
+
+### Changer le rôle d'un utilisateur
+POST {{baseUrl}}/users-change-role
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "user_id": "USER_ID_HERE",
+  "role": "admin"
+}
+

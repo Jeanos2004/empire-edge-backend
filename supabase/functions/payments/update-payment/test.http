@@ -1,0 +1,12 @@
+### ============================================
+### PAYMENTS UPDATE PAYMENT
+### ============================================
+
+### Test
+POST {baseUrl}/payments-update-payment
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

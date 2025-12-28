@@ -1,0 +1,12 @@
+### ============================================
+### VENUES CREATE VENUE
+### ============================================
+
+### Test
+POST {baseUrl}/venues-create-venue
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

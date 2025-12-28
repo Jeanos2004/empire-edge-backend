@@ -1,0 +1,12 @@
+### ============================================
+### PROVIDERS DELETE PROVIDER
+### ============================================
+
+### Test
+POST {baseUrl}/providers-delete-provider
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

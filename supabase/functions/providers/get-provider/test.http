@@ -1,0 +1,12 @@
+### ============================================
+### PROVIDERS GET PROVIDER
+### ============================================
+
+### Test
+GET {baseUrl}/providers-get-provider
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

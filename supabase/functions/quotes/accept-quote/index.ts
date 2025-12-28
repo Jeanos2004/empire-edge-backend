@@ -33,15 +33,21 @@ serve(async (req) => {
       throw new Error('Non authentifié')
     }
 
+    // Créer un client avec service role pour récupérer le profil (évite les problèmes RLS)
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
     // Récupérer le profil
-    const { data: profile } = await supabaseClient
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single()
 
-    if (!profile) {
-      throw new Error('Profil introuvable')
+    if (profileError || !profile) {
+      throw new Error(`Profil introuvable: ${profileError?.message || 'Profil non trouvé'}`)
     }
 
     // Parser le body
@@ -51,8 +57,8 @@ serve(async (req) => {
       throw new Error('quote_id est requis')
     }
 
-    // Vérifier que le devis existe
-    const { data: quote, error: quoteError } = await supabaseClient
+    // Vérifier que le devis existe (utiliser supabaseAdmin pour éviter RLS)
+    const { data: quote, error: quoteError } = await supabaseAdmin
       .from('quotes')
       .select(`
         *,
@@ -66,24 +72,24 @@ serve(async (req) => {
       .single()
 
     if (quoteError || !quote) {
-      throw new Error('Devis introuvable')
+      throw new Error(`Devis introuvable: ${quoteError?.message || 'Devis non trouvé'}`)
     }
 
-    // Vérifier les permissions (seul le client propriétaire peut accepter)
+    // Vérifier les permissions (seul le client propriétaire peut accepter, ou les admins)
     if (profile.role === 'client') {
-      const { data: client } = await supabaseClient
+      const { data: client } = await supabaseAdmin
         .from('clients')
-        .select('profile_id')
+        .select('id, profile_id')
         .eq('profile_id', user.id)
         .single()
 
-      if (!client || quote.events.client_id !== client.profile_id) {
+      if (!client || quote.events.client_id !== client.id) {
         throw new Error('Accès non autorisé à ce devis')
       }
     }
 
     // Vérifier que le devis peut être accepté
-    if (quote.status !== 'sent' && quote.status !== 'draft') {
+    if (quote.status !== 'envoye' && quote.status !== 'brouillon') {
       throw new Error(`Impossible d'accepter un devis avec le statut: ${quote.status}`)
     }
 
@@ -97,11 +103,11 @@ serve(async (req) => {
     // 2. Créer le contrat
     // 3. Mettre à jour le statut de l'événement
 
-    // Mettre à jour le devis
-    const { data: updatedQuote, error: updateError } = await supabaseClient
+    // Mettre à jour le devis (utiliser supabaseAdmin pour éviter RLS)
+    const { data: updatedQuote, error: updateError } = await supabaseAdmin
       .from('quotes')
       .update({
-        status: 'accepted',
+        status: 'accepte',
         accepted_at: new Date().toISOString(),
       })
       .eq('id', body.quote_id)
@@ -116,13 +122,13 @@ serve(async (req) => {
     const now = new Date()
     const dateStr = now.toISOString().split('T')[0].replace(/-/g, '')
     
-    const { data: lastContract } = await supabaseClient
+    const { data: lastContract } = await supabaseAdmin
       .from('contracts')
       .select('contract_number')
       .like('contract_number', `CON-${dateStr}-%`)
       .order('contract_number', { ascending: false })
       .limit(1)
-      .single()
+      .maybeSingle()
 
     let contractNumber: string
     if (lastContract && lastContract.contract_number) {
@@ -132,8 +138,8 @@ serve(async (req) => {
       contractNumber = `CON-${dateStr}-001`
     }
 
-    // Créer le contrat
-    const { data: contract, error: contractError } = await supabaseClient
+    // Créer le contrat (utiliser supabaseAdmin)
+    const { data: contract, error: contractError } = await supabaseAdmin
       .from('contracts')
       .insert({
         quote_id: body.quote_id,
@@ -149,14 +155,14 @@ serve(async (req) => {
       throw new Error(`Erreur lors de la création du contrat: ${contractError.message}`)
     }
 
-    // Mettre à jour le statut de l'événement
-    await supabaseClient
+    // Mettre à jour le statut de l'événement (utiliser supabaseAdmin)
+    await supabaseAdmin
       .from('events')
-      .update({ status: 'confirmed' })
+      .update({ status: 'confirme' })
       .eq('id', quote.events.id)
 
-    // Créer une notification pour l'admin
-    await supabaseClient
+    // Créer une notification pour l'admin (utiliser supabaseAdmin)
+    await supabaseAdmin
       .from('notifications')
       .insert({
         user_id: null, // Notification pour tous les admins

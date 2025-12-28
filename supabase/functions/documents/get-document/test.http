@@ -1,0 +1,12 @@
+### ============================================
+### DOCUMENTS GET DOCUMENT
+### ============================================
+
+### Test
+GET {baseUrl}/documents-get-document
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

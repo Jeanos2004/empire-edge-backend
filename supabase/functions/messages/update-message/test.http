@@ -1,0 +1,12 @@
+### ============================================
+### MESSAGES UPDATE MESSAGE
+### ============================================
+
+### Test
+POST {baseUrl}/messages-update-message
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

@@ -1,0 +1,12 @@
+### ============================================
+### BLOG DELETE POST
+### ============================================
+
+### Test
+POST {baseUrl}/blog-delete-post
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

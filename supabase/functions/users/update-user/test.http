@@ -1,0 +1,20 @@
+### ============================================
+### USERS - UPDATE USER
+### ============================================
+
+### Mettre à jour un utilisateur (Admin peut modifier tous, Client peut modifier uniquement son profil)
+POST {{baseUrl}}/users-update-user
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "user_id": "USER_ID_HERE",
+  "first_name": "Nouveau prénom",
+  "last_name": "Nouveau nom",
+  "phone": "+224612345678",
+  "company_name": "Nouvelle entreprise",
+  "address": "Nouvelle adresse",
+  "city": "Conakry",
+  "role": "admin"
+}
+

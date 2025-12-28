@@ -1,0 +1,12 @@
+### ============================================
+### CONTRACTS UPDATE CONTRACT
+### ============================================
+
+### Test
+POST {baseUrl}/contracts-update-contract
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

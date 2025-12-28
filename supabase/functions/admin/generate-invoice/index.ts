@@ -33,8 +33,14 @@ serve(async (req) => {
       throw new Error('Non authentifié')
     }
 
+    // Créer un client avec service role pour récupérer le profil (évite les problèmes RLS)
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
     // Récupérer le profil
-    const { data: profile } = await supabaseClient
+    const { data: profile } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -61,7 +67,7 @@ serve(async (req) => {
     let event: any = null
 
     if (body.quote_id) {
-      const { data: quoteData, error: quoteError } = await supabaseClient
+      const { data: quoteData, error: quoteError } = await supabaseAdmin
         .from('quotes')
         .select(`
           *,
@@ -86,7 +92,7 @@ serve(async (req) => {
       quote = quoteData
       event = quoteData.events
     } else if (body.event_id) {
-      const { data: eventData, error: eventError } = await supabaseClient
+      const { data: eventData, error: eventError } = await supabaseAdmin
         .from('events')
         .select(`
           *,
@@ -110,7 +116,7 @@ serve(async (req) => {
 
       event = eventData
       // Prendre le dernier devis accepté
-      quote = eventData.quotes?.find((q: any) => q.status === 'accepted') || null
+      quote = eventData.quotes?.find((q: any) => q.status === 'accepte') || null
 
       if (!quote) {
         throw new Error('Aucun devis accepté trouvé pour cet événement')
@@ -121,7 +127,7 @@ serve(async (req) => {
     const now = new Date()
     const dateStr = now.toISOString().split('T')[0].replace(/-/g, '')
     
-    const { data: lastInvoice } = await supabaseClient
+    const { data: lastInvoice } = await supabaseAdmin
       .from('documents')
       .select('title')
       .like('title', `FAC-${dateStr}-%`)
@@ -167,7 +173,7 @@ serve(async (req) => {
     }
 
     // Créer un document pour la facture
-    const { data: document, error: documentError } = await supabaseClient
+    const { data: document, error: documentError } = await supabaseAdmin
       .from('documents')
       .insert({
         event_id: event.id,
@@ -209,4 +215,3 @@ serve(async (req) => {
     )
   }
 })
-

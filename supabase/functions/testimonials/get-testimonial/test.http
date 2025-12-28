@@ -1,0 +1,12 @@
+### ============================================
+### TESTIMONIALS GET TESTIMONIAL
+### ============================================
+
+### Test
+GET {baseUrl}/testimonials-get-testimonial
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

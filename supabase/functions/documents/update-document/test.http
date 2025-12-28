@@ -1,0 +1,12 @@
+### ============================================
+### DOCUMENTS UPDATE DOCUMENT
+### ============================================
+
+### Test
+POST {baseUrl}/documents-update-document
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

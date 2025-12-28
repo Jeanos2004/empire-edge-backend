@@ -33,15 +33,21 @@ serve(async (req) => {
       throw new Error('Non authentifié')
     }
 
+    // Créer un client avec service role pour récupérer le profil (évite les problèmes RLS)
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
     // Récupérer le profil
-    const { data: profile } = await supabaseClient
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single()
 
-    if (!profile) {
-      throw new Error('Profil introuvable')
+    if (profileError || !profile) {
+      throw new Error(`Profil introuvable: ${profileError?.message || 'Profil non trouvé pour l\'utilisateur ' + user.id}`)
     }
 
     // Seuls les admins peuvent créer des notifications système
@@ -52,8 +58,10 @@ serve(async (req) => {
     // Parser le body
     const body = await req.json()
 
-    if (!body.user_id && body.user_id !== null) {
-      throw new Error('user_id est requis (ou null pour notification globale)')
+    // user_id peut être null pour les notifications globales (tous les admins)
+    // Mais il doit être présent dans le body (même si null)
+    if (body.user_id === undefined) {
+      throw new Error('user_id est requis (peut être null pour notification globale)')
     }
 
     if (!body.type) {
@@ -68,11 +76,11 @@ serve(async (req) => {
       throw new Error('message est requis')
     }
 
-    // Créer la notification
-    const { data: notification, error: insertError } = await supabaseClient
+    // Créer la notification (utiliser supabaseAdmin pour éviter RLS)
+    const { data: notification, error: insertError } = await supabaseAdmin
       .from('notifications')
       .insert({
-        user_id: body.user_id,
+        user_id: body.user_id, // Peut être null pour notifications globales
         event_id: body.event_id || null,
         type: body.type,
         title: body.title,

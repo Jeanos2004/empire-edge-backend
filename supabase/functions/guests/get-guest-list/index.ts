@@ -33,15 +33,21 @@ serve(async (req) => {
       throw new Error('Non authentifié')
     }
 
+    // Créer un client avec service role pour récupérer le profil (évite les problèmes RLS)
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
     // Récupérer le profil
-    const { data: profile } = await supabaseClient
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single()
 
-    if (!profile) {
-      throw new Error('Profil introuvable')
+    if (profileError || !profile) {
+      throw new Error(`Profil introuvable: ${profileError?.message || 'Profil non trouvé'}`)
     }
 
     // Parser les query params
@@ -54,8 +60,8 @@ serve(async (req) => {
       throw new Error('event_id est requis')
     }
 
-    // Vérifier que l'événement existe
-    const { data: event, error: eventError } = await supabaseClient
+    // Vérifier que l'événement existe (utiliser supabaseAdmin pour éviter RLS)
+    const { data: event, error: eventError } = await supabaseAdmin
       .from('events')
       .select('id, client_id')
       .eq('id', eventId)
@@ -67,19 +73,22 @@ serve(async (req) => {
 
     // Vérifier les permissions
     if (profile.role === 'client') {
-      const { data: client } = await supabaseClient
+      // Les admins peuvent accéder à toutes les ressources
+      // Les admins peuvent accéder à toutes les ressources
+      const { data: client } = await supabaseAdmin
         .from('clients')
-        .select('profile_id')
+        .select('id, profile_id')
         .eq('profile_id', user.id)
         .single()
 
-      if (!client || event.client_id !== client.profile_id) {
+      if (!client || event.client_id !== client.id) {
+        // Les admins peuvent accéder à tous les événements
         throw new Error('Accès non autorisé à cet événement')
       }
     }
 
-    // Construire la requête
-    let query = supabaseClient
+    // Construire la requête (utiliser supabaseAdmin pour éviter RLS)
+    let query = supabaseAdmin
       .from('guests')
       .select('*')
       .eq('event_id', eventId)

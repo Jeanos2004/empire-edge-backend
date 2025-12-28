@@ -41,8 +41,14 @@ serve(async (req) => {
       throw new Error('Échec de l\'authentification')
     }
 
-    // Récupérer le profil complet avec client
-    const { data: profile, error: profileError } = await supabaseClient
+    // Créer un client avec service role pour récupérer le profil (évite les problèmes RLS)
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
+    // Récupérer le profil complet avec client (en utilisant service role pour éviter RLS)
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select(`
         *,

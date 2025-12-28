@@ -33,8 +33,14 @@ serve(async (req) => {
       throw new Error('Non authentifié')
     }
 
+    // Créer un client avec service role pour récupérer le profil (évite les problèmes RLS)
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
     // Récupérer le profil
-    const { data: profile } = await supabaseClient
+    const { data: profile } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -52,7 +58,7 @@ serve(async (req) => {
     }
 
     // Vérifier que l'événement existe et les permissions
-    const { data: existingEvent, error: fetchError } = await supabaseClient
+    const { data: existingEvent, error: fetchError } = await supabaseAdmin
       .from('events')
       .select('client_id, status')
       .eq('id', body.event_id)
@@ -62,21 +68,30 @@ serve(async (req) => {
       throw new Error('Événement introuvable')
     }
 
+    // Créer un client avec service role pour éviter les problèmes RLS
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
     // Vérifier les permissions
     if (profile.role === 'client') {
-      const { data: client } = await supabaseClient
+      // Les admins peuvent accéder à toutes les ressources
+      const { data: client } = await supabaseAdmin
         .from('clients')
-        .select('profile_id')
+        .select('id, profile_id')
         .eq('profile_id', user.id)
         .single()
 
       if (!client || existingEvent.client_id !== client.profile_id) {
+        // Les admins peuvent modifier tous les événements
         throw new Error('Accès non autorisé à cet événement')
       }
     }
+    // Les admins peuvent modifier tous les événements
 
     // Vérifier si l'événement peut être modifié (pas de devis accepté)
-    if (existingEvent.status === 'completed' || existingEvent.status === 'cancelled') {
+    if (existingEvent.status === 'termine' || existingEvent.status === 'annule') {
       throw new Error('Impossible de modifier un événement terminé ou annulé')
     }
 
@@ -115,13 +130,13 @@ serve(async (req) => {
     }
     if (body.guest_count !== undefined) updates.guest_count = body.guest_count
     if (body.status !== undefined) {
-      // Validation du statut
-      const validStatuses = ['draft', 'confirmed', 'in_progress', 'completed', 'cancelled']
+      // Validation du statut (valeurs selon le schéma SQL)
+      const validStatuses = ['planification', 'confirme', 'en_preparation', 'en_cours', 'termine', 'annule']
       if (!validStatuses.includes(body.status)) {
         throw new Error(`Statut invalide. Valeurs acceptées: ${validStatuses.join(', ')}`)
       }
       // Seuls les admins peuvent changer certains statuts
-      if (['completed', 'cancelled'].includes(body.status) && profile.role !== 'admin' && profile.role !== 'super_admin') {
+      if (['termine', 'annule'].includes(body.status) && profile.role !== 'admin' && profile.role !== 'super_admin') {
         throw new Error('Seuls les administrateurs peuvent définir ce statut')
       }
       updates.status = body.status
@@ -137,7 +152,7 @@ serve(async (req) => {
     }
 
     // Mettre à jour l'événement
-    const { data: updatedEvent, error: updateError } = await supabaseClient
+    const { data: updatedEvent, error: updateError } = await supabaseAdmin
       .from('events')
       .update(updates)
       .eq('id', body.event_id)

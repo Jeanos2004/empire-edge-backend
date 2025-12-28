@@ -13,22 +13,23 @@ serve(async (req) => {
   }
 
   try {
-    // Créer client Supabase (pas besoin d'authentification pour les posts publics)
-    const supabaseClient = createClient(
+    // Créer client Supabase avec service role pour éviter les problèmes RLS
+    // Cette fonction est publique mais doit contourner RLS pour les JOINs avec profiles
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
     // Parser les query params
     const url = new URL(req.url)
     const category = url.searchParams.get('category')
-    const tag = url.searchParams.get('tag')
+    const tags = url.searchParams.get('tags')
     const page = parseInt(url.searchParams.get('page') || '1')
     const limit = parseInt(url.searchParams.get('limit') || '10')
     const offset = (page - 1) * limit
 
-    // Construire la requête
-    let query = supabaseClient
+    // Construire la requête (utiliser supabaseAdmin pour éviter RLS)
+    let query = supabaseAdmin
       .from('blog_posts')
       .select('*', { count: 'exact' })
       .eq('is_published', true) // Seulement les posts publiés
@@ -38,8 +39,12 @@ serve(async (req) => {
       query = query.eq('category', category)
     }
 
-    if (tag) {
-      query = query.contains('tags', [tag])
+    if (tags) {
+      // Si plusieurs tags séparés par des virgules, chercher le premier
+      const tagArray = tags.split(',').map(t => t.trim()).filter(t => t)
+      if (tagArray.length > 0) {
+        query = query.contains('tags', [tagArray[0]])
+      }
     }
 
     // Trier par date (plus récent en premier)

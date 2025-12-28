@@ -33,15 +33,25 @@ serve(async (req) => {
       throw new Error('Non authentifié')
     }
 
+    // Créer un client avec service role pour récupérer le profil (évite les problèmes RLS)
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
     // Récupérer le profil
-    const { data: profile } = await supabaseClient
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single()
 
+    if (profileError) {
+      throw new Error(`Erreur lors de la récupération du profil: ${profileError.message}`)
+    }
+
     if (!profile) {
-      throw new Error('Profil introuvable')
+      throw new Error(`Profil introuvable pour l'utilisateur ${user.id}. Assurez-vous que le profil existe dans la table profiles.`)
     }
 
     // Seuls les admins peuvent créer des devis
@@ -60,15 +70,15 @@ serve(async (req) => {
       throw new Error('Au moins un item est requis dans le devis')
     }
 
-    // Vérifier que l'événement existe
-    const { data: event, error: eventError } = await supabaseClient
+    // Vérifier que l'événement existe (utiliser supabaseAdmin pour éviter RLS)
+    const { data: event, error: eventError } = await supabaseAdmin
       .from('events')
       .select('id, client_id, status')
       .eq('id', body.event_id)
       .single()
 
     if (eventError || !event) {
-      throw new Error('Événement introuvable')
+      throw new Error(`Événement introuvable: ${eventError?.message || 'Événement non trouvé'}`)
     }
 
     // TODO: Utiliser une transaction PostgreSQL via RPC pour garantir l'atomicité
@@ -82,14 +92,14 @@ serve(async (req) => {
     const now = new Date()
     const dateStr = now.toISOString().split('T')[0].replace(/-/g, '')
     
-    // Récupérer le dernier numéro de devis du jour
-    const { data: lastQuote } = await supabaseClient
+    // Récupérer le dernier numéro de devis du jour (utiliser supabaseAdmin)
+    const { data: lastQuote } = await supabaseAdmin
       .from('quotes')
       .select('quote_number')
       .like('quote_number', `QUO-${dateStr}-%`)
       .order('quote_number', { ascending: false })
       .limit(1)
-      .single()
+      .maybeSingle()
 
     let quoteNumber: string
     if (lastQuote && lastQuote.quote_number) {
@@ -138,18 +148,19 @@ serve(async (req) => {
     // Date de validité (30 jours par défaut)
     const validityDate = body.validity_date || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
 
-    // Créer le devis
-    const { data: quote, error: quoteError } = await supabaseClient
+    // Créer le devis (utiliser supabaseAdmin pour éviter RLS)
+    const { data: quote, error: quoteError } = await supabaseAdmin
       .from('quotes')
       .insert({
         event_id: body.event_id,
         quote_number: quoteNumber,
-        status: 'draft',
+        status: 'brouillon',
         subtotal,
         tax_amount: taxAmount,
         discount_amount: discountAmount,
         total_amount: totalAmount,
         validity_date: validityDate,
+        notes: body.notes || null,
       })
       .select()
       .single()
@@ -158,24 +169,24 @@ serve(async (req) => {
       throw new Error(`Erreur lors de la création du devis: ${quoteError.message}`)
     }
 
-    // Créer les items du devis
+    // Créer les items du devis (utiliser supabaseAdmin)
     const itemsToInsert = quoteItems.map(item => ({
       ...item,
       quote_id: quote.id,
     }))
 
-    const { error: itemsError } = await supabaseClient
+    const { error: itemsError } = await supabaseAdmin
       .from('quote_items')
       .insert(itemsToInsert)
 
     if (itemsError) {
       // Rollback: supprimer le devis créé
-      await supabaseClient.from('quotes').delete().eq('id', quote.id)
+      await supabaseAdmin.from('quotes').delete().eq('id', quote.id)
       throw new Error(`Erreur lors de la création des items: ${itemsError.message}`)
     }
 
-    // Récupérer le devis complet avec items
-    const { data: fullQuote, error: fetchError } = await supabaseClient
+    // Récupérer le devis complet avec items (utiliser supabaseAdmin)
+    const { data: fullQuote, error: fetchError } = await supabaseAdmin
       .from('quotes')
       .select(`
         *,

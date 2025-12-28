@@ -1,0 +1,13 @@
+### ============================================
+### USERS - DELETE USER (Admin uniquement)
+### ============================================
+
+### Supprimer un utilisateur
+POST {{baseUrl}}/users-delete-user
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "user_id": "USER_ID_HERE"
+}
+

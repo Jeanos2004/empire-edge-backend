@@ -6,8 +6,8 @@ POST {{baseUrl}}/auth-login
 Content-Type: application/json
 
 {
-  "email": "client@example.com",
-  "password": "password123"
+  "email": "admin@empire-events.com",
+  "password": "Admin123456"
 }
 
 ### Test 2 - Erreur: email manquant

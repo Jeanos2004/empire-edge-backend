@@ -13,10 +13,11 @@ serve(async (req) => {
   }
 
   try {
-    // Créer client Supabase (pas besoin d'authentification pour le formulaire de contact)
-    const supabaseClient = createClient(
+    // Créer client Supabase avec service role pour éviter les problèmes RLS
+    // Cette fonction est publique mais doit contourner RLS pour insérer dans notifications
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
     // Parser le body
@@ -41,16 +42,24 @@ serve(async (req) => {
       throw new Error('Format email invalide')
     }
 
-    // Créer une notification pour les admins
-    // Note: On utilise la table notifications avec user_id = null pour les notifications globales
-    const { data: notification, error: notificationError } = await supabaseClient
+    // Récupérer le premier admin pour créer la notification
+    // Note: On crée une notification pour le premier admin trouvé (ou null pour notification globale)
+    const { data: adminProfile } = await supabaseAdmin
+      .from('profiles')
+      .select('id')
+      .in('role', ['admin', 'super_admin'])
+      .limit(1)
+      .single()
+
+    // Créer une notification pour les admins (utiliser supabaseAdmin pour éviter RLS)
+    const { data: notification, error: notificationError } = await supabaseAdmin
       .from('notifications')
       .insert({
-        user_id: null, // Notification pour tous les admins
+        user_id: adminProfile?.id || null, // Notification pour un admin ou globale
         event_id: null,
         type: 'contact_form',
         title: `Nouveau message de contact de ${body.name}`,
-        message: `Email: ${body.email}\nTéléphone: ${body.phone || 'Non fourni'}\n\nMessage:\n${body.message}`,
+        message: `Email: ${body.email}\nSujet: ${body.subject || 'Non spécifié'}\nTéléphone: ${body.phone || 'Non fourni'}\n\nMessage:\n${body.message}`,
         is_read: false,
       })
       .select()

@@ -1,0 +1,12 @@
+### ============================================
+### DOCUMENTS DELETE DOCUMENT
+### ============================================
+
+### Test
+POST {baseUrl}/documents-delete-document
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

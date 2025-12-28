@@ -1,0 +1,12 @@
+### ============================================
+### VENUES GET VENUE
+### ============================================
+
+### Test
+GET {baseUrl}/venues-get-venue
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

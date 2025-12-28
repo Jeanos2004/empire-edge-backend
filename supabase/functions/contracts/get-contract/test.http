@@ -1,0 +1,12 @@
+### ============================================
+### CONTRACTS GET CONTRACT
+### ============================================
+
+### Test
+GET {baseUrl}/contracts-get-contract
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

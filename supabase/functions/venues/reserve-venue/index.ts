@@ -33,8 +33,14 @@ serve(async (req) => {
       throw new Error('Non authentifié')
     }
 
+    // Créer un client avec service role pour récupérer le profil (évite les problèmes RLS)
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
     // Récupérer le profil
-    const { data: profile } = await supabaseClient
+    const { data: profile } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -55,14 +61,10 @@ serve(async (req) => {
       throw new Error('venue_id est requis')
     }
 
-    if (!body.date) {
-      throw new Error('date est requise')
-    }
-
-    // Vérifier que l'événement existe
-    const { data: event, error: eventError } = await supabaseClient
+    // Vérifier que l'événement existe (utiliser supabaseAdmin pour éviter RLS)
+    const { data: event, error: eventError } = await supabaseAdmin
       .from('events')
-      .select('id, client_id, venue_id, event_date, guest_count')
+      .select('id, client_id, venue_id, event_date, guest_count, start_time, end_time, title')
       .eq('id', body.event_id)
       .single()
 
@@ -70,21 +72,25 @@ serve(async (req) => {
       throw new Error('Événement introuvable')
     }
 
-    // Vérifier les permissions
+    // Vérifier les permissions (les admins peuvent réserver pour tous les événements)
     if (profile.role === 'client') {
-      const { data: client } = await supabaseClient
+      const { data: client } = await supabaseAdmin
         .from('clients')
-        .select('profile_id')
+        .select('id, profile_id')
         .eq('profile_id', user.id)
         .single()
 
-      if (!client || event.client_id !== client.profile_id) {
+      if (!client || event.client_id !== client.id) {
         throw new Error('Accès non autorisé à cet événement')
       }
     }
+    // Les admins peuvent réserver pour tous les événements
+
+    // Utiliser la date de l'événement (event_date est un DATE dans le schéma)
+    const reservationDate = event.event_date
 
     // Vérifier que le lieu existe et est disponible
-    const { data: venue, error: venueError } = await supabaseClient
+    const { data: venue, error: venueError } = await supabaseAdmin
       .from('venues')
       .select('id, name, is_available, capacity_max')
       .eq('id', body.venue_id)
@@ -104,12 +110,11 @@ serve(async (req) => {
     }
 
     // Vérifier la disponibilité pour la date
-    const dateOnly = body.date.split('T')[0]
-    const { data: availability } = await supabaseClient
+    const { data: availability } = await supabaseAdmin
       .from('venue_availability')
       .select('is_available')
       .eq('venue_id', body.venue_id)
-      .eq('date', dateOnly)
+      .eq('date', reservationDate)
       .single()
 
     if (availability && !availability.is_available) {
@@ -117,11 +122,11 @@ serve(async (req) => {
     }
 
     // Vérifier si le lieu est déjà réservé pour cette date
-    const { data: existingEvent } = await supabaseClient
+    const { data: existingEvent } = await supabaseAdmin
       .from('events')
       .select('id')
       .eq('venue_id', body.venue_id)
-      .eq('event_date', body.date)
+      .eq('event_date', reservationDate)
       .neq('id', body.event_id)
       .limit(1)
       .single()
@@ -130,16 +135,11 @@ serve(async (req) => {
       throw new Error('Le lieu est déjà réservé pour cette date')
     }
 
-    // TODO: Utiliser une transaction PostgreSQL via RPC pour garantir l'atomicité
-    // 1. Mettre à jour l'événement avec le venue_id
-    // 2. Créer l'entrée venue_availability
-
-    // Mettre à jour l'événement
-    const { data: updatedEvent, error: updateError } = await supabaseClient
+    // Mettre à jour l'événement avec le venue_id (utiliser supabaseAdmin)
+    const { data: updatedEvent, error: updateError } = await supabaseAdmin
       .from('events')
       .update({
         venue_id: body.venue_id,
-        event_date: body.date,
       })
       .eq('id', body.event_id)
       .select()
@@ -149,13 +149,14 @@ serve(async (req) => {
       throw new Error(`Erreur lors de la réservation: ${updateError.message}`)
     }
 
-    // Créer ou mettre à jour l'entrée venue_availability
-    const { error: availabilityError } = await supabaseClient
+    // Créer ou mettre à jour l'entrée venue_availability (utiliser supabaseAdmin)
+    const { error: availabilityError } = await supabaseAdmin
       .from('venue_availability')
       .upsert({
         venue_id: body.venue_id,
-        date: dateOnly,
+        date: reservationDate,
         is_available: false,
+        reason: `Réservé pour l'événement: ${event.title || body.event_id}`
       }, {
         onConflict: 'venue_id,date'
       })
@@ -170,7 +171,7 @@ serve(async (req) => {
         data: {
           event: updatedEvent,
           venue: venue,
-          reservation_date: dateOnly,
+          reservation_date: reservationDate,
         },
         message: 'Lieu réservé avec succès'
       }),
@@ -192,4 +193,3 @@ serve(async (req) => {
     )
   }
 })
-

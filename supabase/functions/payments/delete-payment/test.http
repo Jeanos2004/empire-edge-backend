@@ -1,0 +1,12 @@
+### ============================================
+### PAYMENTS DELETE PAYMENT
+### ============================================
+
+### Test
+POST {baseUrl}/payments-delete-payment
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

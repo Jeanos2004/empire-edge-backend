@@ -1,15 +1,16 @@
 ### Variables
 @baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
-@authToken = YOUR_JWT_TOKEN_HERE
+@authToken = eyJhbGciOiJIUzI1NiIsImtpZCI6ImdiZUI1RnhPdjRsakNuUkUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3FqZnlnanRvbmRsanl3aGJxYmZqLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJjNmIzMWZjOC00YTJlLTQwMmMtYjdlMC04ODI3YzZjZTNkM2UiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzY2MzcyMzg1LCJpYXQiOjE3NjYzNjg3ODUsImVtYWlsIjoiYWRtaW5AZW1waXJlLWV2ZW50cy5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiQWRtaW4iLCJsYXN0X25hbWUiOiJFbXBpcmUiLCJwaG9uZSI6IisyMjQ2MTIzNDU2NzgifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc2NjM2ODc4NX1dLCJzZXNzaW9uX2lkIjoiNWE2ZTRkMjAtYzY1My00NGI0LWJkMGItZmJjMmFhM2ZkODJkIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.OTdIyLgQsN-ncge997M8HqbrttRsQpUiLKzc8M8MArg
 
 ### Test 1 - Créer événement complet (cas nominal)
+### Note: Pour les admins, le client_id est optionnel. S'il n'est pas fourni, le premier client disponible sera utilisé.
 POST {{baseUrl}}/events-create-event
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {
-  "event_type": "mariage",
-  "event_category": "cérémonie",
+  "event_type": "mariage_moderne",
+  "event_category": "prive_familial",
   "title": "Mariage de Jean et Marie",
   "event_date": "2024-12-25T18:00:00Z",
   "venue_id": "venue-uuid-here",
@@ -17,16 +18,19 @@ Content-Type: application/json
   "budget_min": 5000000,
   "budget_max": 10000000,
   "style": "moderne",
-  "is_hybrid": false
+  "is_hybrid": false,
+  "client_id": "client-uuid-here"
 }
 
 ### Test 2 - Créer événement minimal (sans lieu)
+### Note: Pour les admins, le client_id est optionnel. S'il n'est pas fourni, le premier client disponible sera utilisé.
 POST {{baseUrl}}/events-create-event
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {
-  "event_type": "séminaire",
+  "event_type": "seminaire",
+  "event_category": "corporate_professionnel",
   "title": "Séminaire Entreprise",
   "event_date": "2024-11-15T09:00:00Z",
   "guest_count": 50
@@ -39,8 +43,9 @@ Content-Type: application/json
 
 {
   "event_type": "concert",
+  "event_category": "culturel_artistique",
   "title": "Concert",
-  "event_date": "2020-01-01T18:00:00Z"
+  "event_date": "2024-12-31T18:00:00Z"
 }
 
 ### Test 4 - Erreur: titre manquant
@@ -49,7 +54,8 @@ Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {
-  "event_type": "mariage",
+  "event_type": "mariage_moderne",
+  "event_category": "prive_familial",
   "event_date": "2024-12-25T18:00:00Z"
 }
 
@@ -59,7 +65,8 @@ Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {
-  "event_type": "mariage",
+  "event_type": "mariage_moderne",
+  "event_category": "prive_familial",
   "title": "Grand Mariage",
   "event_date": "2024-12-25T18:00:00Z",
   "venue_id": "venue-uuid-here",

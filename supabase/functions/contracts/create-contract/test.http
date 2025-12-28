@@ -1,0 +1,12 @@
+### ============================================
+### CONTRACTS CREATE CONTRACT
+### ============================================
+
+### Test
+POST {baseUrl}/contracts-create-contract
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

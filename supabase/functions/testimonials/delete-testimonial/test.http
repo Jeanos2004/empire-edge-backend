@@ -1,0 +1,12 @@
+### ============================================
+### TESTIMONIALS DELETE TESTIMONIAL
+### ============================================
+
+### Test
+POST {baseUrl}/testimonials-delete-testimonial
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

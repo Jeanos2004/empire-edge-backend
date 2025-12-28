@@ -1,0 +1,12 @@
+### ============================================
+### VENUES UPDATE VENUE
+### ============================================
+
+### Test
+POST {baseUrl}/venues-update-venue
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

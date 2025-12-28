@@ -1,0 +1,12 @@
+### ============================================
+### TESTIMONIALS UPDATE TESTIMONIAL
+### ============================================
+
+### Test
+POST {baseUrl}/testimonials-update-testimonial
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

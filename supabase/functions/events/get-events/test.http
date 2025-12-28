@@ -1,6 +1,6 @@
 ### Variables
 @baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
-@authToken = YOUR_JWT_TOKEN_HERE
+@authToken = eyJhbGciOiJIUzI1NiIsImtpZCI6ImdiZUI1RnhPdjRsakNuUkUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3FqZnlnanRvbmRsanl3aGJxYmZqLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJjNmIzMWZjOC00YTJlLTQwMmMtYjdlMC04ODI3YzZjZTNkM2UiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzY2MzcyMTgwLCJpYXQiOjE3NjYzNjg1ODAsImVtYWlsIjoiYWRtaW5AZW1waXJlLWV2ZW50cy5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiQWRtaW4iLCJsYXN0X25hbWUiOiJFbXBpcmUiLCJwaG9uZSI6IisyMjQ2MTIzNDU2NzgifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc2NjM2ODU4MH1dLCJzZXNzaW9uX2lkIjoiOTMxYTcxNjAtNmU2MS00NzczLWEwOTUtYmQ1YTY2MzVjNDdlIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.P60Y7zld99knxs7Enkl-YeZjYwFwTp9rIbBaVCW5otE
 
 ### Test 1 - Récupérer tous les événements (cas nominal)
 GET {{baseUrl}}/events-get-events
@@ -11,7 +11,7 @@ GET {{baseUrl}}/events-get-events?status=draft
 Authorization: Bearer {{authToken}}
 
 ### Test 3 - Filtrer par type d'événement
-GET {{baseUrl}}/events-get-events?event_type=mariage
+GET {{baseUrl}}/events-get-events?event_type=mariage_moderne
 Authorization: Bearer {{authToken}}
 
 ### Test 4 - Filtrer par période
@@ -23,6 +23,6 @@ GET {{baseUrl}}/events-get-events?page=2&limit=5
 Authorization: Bearer {{authToken}}
 
 ### Test 6 - Combinaison de filtres
-GET {{baseUrl}}/events-get-events?status=confirmed&event_type=mariage&start_date=2024-06-01
+GET {{baseUrl}}/events-get-events?status=confirme&event_type=mariage_moderne&start_date=2024-06-01
 Authorization: Bearer {{authToken}}
 

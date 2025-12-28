@@ -1,0 +1,12 @@
+### ============================================
+### SERVICES CREATE SERVICE
+### ============================================
+
+### Test
+POST {baseUrl}/services-create-service
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

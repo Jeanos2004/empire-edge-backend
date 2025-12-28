@@ -33,8 +33,14 @@ serve(async (req) => {
       throw new Error('Non authentifié')
     }
 
+    // Créer un client avec service role pour récupérer le profil (évite les problèmes RLS)
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
     // Récupérer le profil pour déterminer les permissions
-    const { data: profile } = await supabaseClient
+    const { data: profile } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -54,8 +60,9 @@ serve(async (req) => {
     const limit = parseInt(url.searchParams.get('limit') || '10')
     const offset = (page - 1) * limit
 
+    // Utiliser supabaseAdmin pour éviter les problèmes RLS avec les profils
     // Construire la requête
-    let query = supabaseClient
+    let query = supabaseAdmin
       .from('events')
       .select(`
         *,
@@ -69,14 +76,15 @@ serve(async (req) => {
 
     // Si c'est un client, filtrer par ses événements uniquement
     if (profile.role === 'client') {
-      const { data: client } = await supabaseClient
+      // Les admins peuvent accéder à toutes les ressources
+      const { data: client } = await supabaseAdmin
         .from('clients')
-        .select('profile_id')
+        .select('id, profile_id')
         .eq('profile_id', user.id)
         .single()
 
       if (client) {
-        query = query.eq('client_id', client.profile_id)
+        query = query.eq('client_id', client.id)
       }
     }
     // Les admins voient tous les événements

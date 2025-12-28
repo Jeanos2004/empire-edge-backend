@@ -1,0 +1,12 @@
+### ============================================
+### NOTIFICATIONS DELETE NOTIFICATION
+### ============================================
+
+### Test
+POST {baseUrl}/notifications-delete-notification
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

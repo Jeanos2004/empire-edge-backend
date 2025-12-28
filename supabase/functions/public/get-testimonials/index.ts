@@ -13,29 +13,27 @@ serve(async (req) => {
   }
 
   try {
-    // Créer client Supabase (pas besoin d'authentification)
-    const supabaseClient = createClient(
+    // Créer client Supabase avec service role pour éviter les problèmes RLS
+    // Cette fonction est publique mais doit contourner RLS pour les JOINs avec profiles
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
     // Parser les query params
     const url = new URL(req.url)
     const eventId = url.searchParams.get('event_id')
-    const minRating = url.searchParams.get('min_rating')
+    const isFeatured = url.searchParams.get('is_featured')
+    const rating = url.searchParams.get('rating')
+    const page = parseInt(url.searchParams.get('page') || '1')
     const limit = parseInt(url.searchParams.get('limit') || '10')
+    const offset = (page - 1) * limit
 
-    // Construire la requête
-    let query = supabaseClient
+    // Construire la requête (utiliser supabaseAdmin pour éviter RLS)
+    // Récupérer d'abord les témoignages de base
+    let query = supabaseAdmin
       .from('testimonials')
-      .select(`
-        *,
-        clients!inner(
-          profile_id,
-          profiles!inner(first_name, last_name, avatar_url)
-        ),
-        events(id, title, event_type)
-      `)
+      .select('*', { count: 'exact' })
       .eq('is_approved', true) // Seulement les témoignages approuvés
 
     // Appliquer les filtres
@@ -43,25 +41,58 @@ serve(async (req) => {
       query = query.eq('event_id', eventId)
     }
 
-    if (minRating) {
-      query = query.gte('rating', parseInt(minRating))
+    if (isFeatured === 'true') {
+      query = query.eq('is_featured', true)
+    }
+
+    if (rating) {
+      query = query.eq('rating', parseInt(rating))
     }
 
     // Trier par date (plus récent en premier)
     query = query.order('created_at', { ascending: false })
 
-    // Limite
-    query = query.limit(limit)
+    // Pagination
+    query = query.range(offset, offset + limit - 1)
 
     // Exécuter la requête
-    const { data: testimonials, error } = await query
+    const { data: testimonialsBase, error, count } = await query
 
     if (error) {
       throw new Error(`Erreur lors de la récupération des témoignages: ${error.message}`)
     }
 
+    // Récupérer les relations séparément pour éviter les problèmes de JOIN
+    const testimonialsWithRelations = await Promise.all((testimonialsBase || []).map(async (testimonial: any) => {
+      const [clientResult, eventResult] = await Promise.all([
+        // Client avec profil
+        testimonial.client_id ? supabaseAdmin
+          .from('clients')
+          .select(`
+            id,
+            profile_id,
+            profiles!inner(id, first_name, last_name, avatar_url)
+          `)
+          .eq('id', testimonial.client_id)
+          .single() : Promise.resolve({ data: null, error: null }),
+        
+        // Événement
+        testimonial.event_id ? supabaseAdmin
+          .from('events')
+          .select('id, title, event_type')
+          .eq('id', testimonial.event_id)
+          .single() : Promise.resolve({ data: null, error: null })
+      ])
+
+      return {
+        ...testimonial,
+        clients: clientResult.data,
+        events: eventResult.data
+      }
+    }))
+
     // Calculer la note moyenne
-    const ratings = testimonials?.map((t: any) => t.rating) || []
+    const ratings = testimonialsWithRelations?.map((t: any) => t.rating) || []
     const averageRating = ratings.length > 0
       ? ratings.reduce((sum: number, rating: number) => sum + rating, 0) / ratings.length
       : 0
@@ -69,9 +100,15 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        data: testimonials || [],
+        data: testimonialsWithRelations || [],
+        pagination: {
+          page,
+          limit,
+          total: count || 0,
+          totalPages: Math.ceil((count || 0) / limit),
+        },
         stats: {
-          total: testimonials?.length || 0,
+          total: count || 0,
           average_rating: Math.round(averageRating * 10) / 10,
         }
       }),

@@ -47,6 +47,27 @@ convert_name() {
     echo "$1" | tr '/' '-'
 }
 
+# Liste des fonctions publiques (sans vérification JWT)
+PUBLIC_FUNCTIONS=(
+    "auth-register"
+    "auth-login"
+    "guests-rsvp"
+    "public-get-blog-posts"
+    "public-get-testimonials"
+    "public-submit-contact-form"
+)
+
+# Fonction pour vérifier si une fonction est publique
+is_public_function() {
+    local func_name=$1
+    for pub_func in "${PUBLIC_FUNCTIONS[@]}"; do
+        if [ "$func_name" == "$pub_func" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
 # Fonction pour déployer
 deploy_function() {
     local func_name=$1
@@ -65,7 +86,14 @@ deploy_function() {
     
     # Déployer depuis le dossier temporaire
     cd "$TEMP_DIR"
-    npx supabase functions deploy "$supabase_name" --project-ref "$PROJECT_REF" > /tmp/deploy_output.log 2>&1
+    
+    # Ajouter --no-verify-jwt pour les fonctions publiques
+    if is_public_function "$supabase_name"; then
+        npx supabase functions deploy "$supabase_name" --project-ref "$PROJECT_REF" --no-verify-jwt > /tmp/deploy_output.log 2>&1
+    else
+        npx supabase functions deploy "$supabase_name" --project-ref "$PROJECT_REF" > /tmp/deploy_output.log 2>&1
+    fi
+    
     local deploy_status=$?
     cd ..
     rm -rf "$TEMP_DIR/supabase/functions/$supabase_name"

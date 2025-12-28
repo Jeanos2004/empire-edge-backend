@@ -33,15 +33,21 @@ serve(async (req) => {
       throw new Error('Non authentifié')
     }
 
+    // Créer un client avec service role pour récupérer le profil (évite les problèmes RLS)
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
     // Récupérer le profil
-    const { data: profile } = await supabaseClient
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single()
 
-    if (!profile) {
-      throw new Error('Profil introuvable')
+    if (profileError || !profile) {
+      throw new Error(`Profil introuvable: ${profileError?.message || 'Profil non trouvé pour l\'utilisateur ' + user.id}`)
     }
 
     // Parser les query params
@@ -52,13 +58,31 @@ serve(async (req) => {
       throw new Error('event_id est requis')
     }
 
-    // Récupérer l'événement avec toutes les relations
-    let query = supabaseClient
+    // D'abord vérifier que l'événement existe (requête simple)
+    const { data: eventBase, error: eventBaseError } = await supabaseAdmin
       .from('events')
-      .select(`
-        *,
-        venues(*),
-        clients!inner(
+      .select('id, client_id, venue_id, title, event_date, status')
+      .eq('id', eventId)
+      .single()
+
+    if (eventBaseError || !eventBase) {
+      throw new Error(`Événement introuvable: ${eventBaseError?.message || 'Événement non trouvé avec l\'ID ' + eventId}`)
+    }
+
+    // Ensuite récupérer toutes les relations séparément pour éviter les problèmes de JOIN
+    const [venueResult, clientResult, quotesResult, eventServicesResult] = await Promise.all([
+      // Venue
+      eventBase.venue_id ? supabaseAdmin
+        .from('venues')
+        .select('*')
+        .eq('id', eventBase.venue_id)
+        .single() : Promise.resolve({ data: null, error: null }),
+      
+      // Client avec profil
+      supabaseAdmin
+        .from('clients')
+        .select(`
+          id,
           profile_id,
           address,
           city,
@@ -70,8 +94,14 @@ serve(async (req) => {
             email,
             avatar_url
           )
-        ),
-        quotes(
+        `)
+        .eq('id', eventBase.client_id)
+        .single(),
+      
+      // Quotes
+      supabaseAdmin
+        .from('quotes')
+        .select(`
           id,
           quote_number,
           status,
@@ -81,20 +111,15 @@ serve(async (req) => {
           total_amount,
           validity_date,
           sent_at,
-          accepted_at,
-          quote_items(
-            id,
-            description,
-            quantity,
-            unit_price,
-            total_price,
-            event_services(
-              service_id,
-              services(name, service_type)
-            )
-          )
-        ),
-        event_services(
+          accepted_at
+        `)
+        .eq('event_id', eventId)
+        .order('created_at', { ascending: false }),
+      
+      // Event services
+      supabaseAdmin
+        .from('event_services')
+        .select(`
           id,
           service_id,
           provider_id,
@@ -104,38 +129,68 @@ serve(async (req) => {
           total_price,
           services(name, service_type, description),
           providers(name, email, phone, rating)
-        )
-      `)
-      .eq('id', eventId)
-      .single()
+        `)
+        .eq('event_id', eventId)
+    ])
 
-    const { data: event, error: eventError } = await query
-
-    if (eventError || !event) {
-      throw new Error('Événement introuvable')
-    }
-
-    // Vérifier les permissions
-    if (profile.role === 'client') {
-      const { data: client } = await supabaseClient
-        .from('clients')
-        .select('profile_id')
-        .eq('profile_id', user.id)
-        .single()
-
-      if (!client || event.client_id !== client.profile_id) {
-        throw new Error('Accès non autorisé à cet événement')
+    // Récupérer les quote_items pour chaque quote
+    let quotesWithItems = []
+    if (quotesResult.data) {
+      for (const quote of quotesResult.data) {
+        const { data: quoteItems } = await supabaseAdmin
+          .from('quote_items')
+          .select(`
+            id,
+            description,
+            quantity,
+            unit_price,
+            total_price,
+            event_services(
+              service_id,
+              services(name, service_type)
+            )
+          `)
+          .eq('quote_id', quote.id)
+        
+        quotesWithItems.push({
+          ...quote,
+          quote_items: quoteItems || []
+        })
       }
     }
 
-    // Compter les invités
-    const { count: guestCount } = await supabaseClient
+    // Construire l'objet événement complet
+    const event = {
+      ...eventBase,
+      venues: venueResult.data,
+      clients: clientResult.data,
+      quotes: quotesWithItems,
+      event_services: eventServicesResult.data || []
+    }
+
+    // Vérifier les permissions (les admins peuvent accéder à tous les événements)
+    if (profile.role === 'client') {
+      // Les admins peuvent accéder à toutes les ressources
+      const { data: client } = await supabaseAdmin
+        .from('clients')
+        .select('id, profile_id')
+        .eq('profile_id', user.id)
+        .single()
+
+      if (!client || event.client_id !== client.id) {
+        throw new Error('Accès non autorisé à cet événement')
+      }
+    }
+    // Les admins peuvent accéder à tous les événements
+
+    // Compter les invités (utiliser supabaseAdmin)
+    const { count: guestCount } = await supabaseAdmin
       .from('guests')
       .select('*', { count: 'exact', head: true })
       .eq('event_id', eventId)
 
-    // Compter les invités par statut RSVP
-    const { data: rsvpStats } = await supabaseClient
+    // Compter les invités par statut RSVP (utiliser supabaseAdmin)
+    const { data: rsvpStats } = await supabaseAdmin
       .from('guests')
       .select('rsvp_status')
       .eq('event_id', eventId)
@@ -154,8 +209,8 @@ serve(async (req) => {
       }
     })
 
-    // Récupérer les paiements
-    const { data: payments } = await supabaseClient
+    // Récupérer les paiements (utiliser supabaseAdmin)
+    const { data: payments } = await supabaseAdmin
       .from('payments')
       .select('*')
       .eq('event_id', eventId)
@@ -171,11 +226,11 @@ serve(async (req) => {
 
     payments?.forEach((payment) => {
       paymentStats.total += payment.amount || 0
-      if (payment.status === 'paid') {
+      if (payment.status === 'paye') {
         paymentStats.paid += payment.amount || 0
-      } else if (payment.status === 'pending') {
+      } else if (payment.status === 'en_attente' || payment.status === 'acompte_recu' || payment.status === 'partiellement_paye') {
         paymentStats.pending += payment.amount || 0
-        if (new Date(payment.due_date) < new Date()) {
+        if (payment.due_date && new Date(payment.due_date) < new Date()) {
           paymentStats.overdue += payment.amount || 0
         }
       }

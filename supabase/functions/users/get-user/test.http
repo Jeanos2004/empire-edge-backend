@@ -1,0 +1,8 @@
+### ============================================
+### USERS - GET USER BY ID
+### ============================================
+
+### Récupérer un utilisateur spécifique (Admin peut voir tous, Client peut voir uniquement son profil)
+GET {{baseUrl}}/users-get-user?user_id=USER_ID_HERE
+Authorization: Bearer {{token}}
+

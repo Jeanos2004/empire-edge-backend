@@ -1,0 +1,12 @@
+### ============================================
+### DOCUMENTS CREATE DOCUMENT
+### ============================================
+
+### Test
+POST {baseUrl}/documents-create-document
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

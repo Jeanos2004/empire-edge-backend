@@ -1,0 +1,12 @@
+### ============================================
+### NOTIFICATIONS GET NOTIFICATION
+### ============================================
+
+### Test
+GET {baseUrl}/notifications-get-notification
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

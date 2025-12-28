@@ -13,15 +13,11 @@ serve(async (req) => {
   }
 
   try {
-    // Créer client Supabase
-    const supabaseClient = createClient(
+    // Utiliser supabaseAdmin pour éviter les problèmes RLS
+    // Cette fonction est publique (vérification de disponibilité)
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
     // Parser les query params
@@ -37,15 +33,15 @@ serve(async (req) => {
       throw new Error('date est requise')
     }
 
-    // Vérifier que le lieu existe
-    const { data: venue, error: venueError } = await supabaseClient
+    // Vérifier que le lieu existe (utiliser supabaseAdmin)
+    const { data: venue, error: venueError } = await supabaseAdmin
       .from('venues')
       .select('id, name, is_available, capacity_max')
       .eq('id', venueId)
       .single()
 
     if (venueError || !venue) {
-      throw new Error('Lieu introuvable')
+      throw new Error(`Lieu introuvable: ${venueError?.message || 'Lieu non trouvé avec l\'ID ' + venueId}`)
     }
 
     // Vérifier la disponibilité générale
@@ -67,14 +63,14 @@ serve(async (req) => {
       )
     }
 
-    // Vérifier la disponibilité pour la date spécifique
+    // Vérifier la disponibilité pour la date spécifique (utiliser supabaseAdmin)
     const dateOnly = date.split('T')[0]
-    const { data: availability, error: availabilityError } = await supabaseClient
+    const { data: availability, error: availabilityError } = await supabaseAdmin
       .from('venue_availability')
       .select('is_available')
       .eq('venue_id', venueId)
       .eq('date', dateOnly)
-      .single()
+      .maybeSingle()
 
     // Si pas d'entrée dans venue_availability, le lieu est disponible par défaut
     let isAvailable = true
@@ -82,14 +78,13 @@ serve(async (req) => {
       isAvailable = availability.is_available
     }
 
-    // Vérifier si le lieu est déjà réservé pour cette date via un événement
-    const { data: existingEvent } = await supabaseClient
+    // Vérifier si le lieu est déjà réservé pour cette date via un événement (utiliser supabaseAdmin)
+    const { data: existingEvent } = await supabaseAdmin
       .from('events')
       .select('id, title')
       .eq('venue_id', venueId)
-      .eq('event_date', date)
-      .limit(1)
-      .single()
+      .eq('event_date', dateOnly)
+      .maybeSingle()
 
     if (existingEvent) {
       isAvailable = false

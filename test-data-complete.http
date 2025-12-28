@@ -1,0 +1,780 @@
+### ============================================
+### FICHIER DE DONNÉES DE TEST COMPLET
+### Suit le flux logique de l'application
+### ============================================
+
+### Variables
+@baseUrl = https://qjfygjtondljywhbqbfj.supabase.co/functions/v1
+@adminToken = eyJhbGciOiJIUzI1NiIsImtpZCI6ImdiZUI1RnhPdjRsakNuUkUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3FqZnlnanRvbmRsanl3aGJxYmZqLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJjNmIzMWZjOC00YTJlLTQwMmMtYjdlMC04ODI3YzZjZTNkM2UiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzY2Mzc2OTU1LCJpYXQiOjE3NjYzNzMzNTUsImVtYWlsIjoiYWRtaW5AZW1waXJlLWV2ZW50cy5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiQWRtaW4iLCJsYXN0X25hbWUiOiJFbXBpcmUiLCJwaG9uZSI6IisyMjQ2MTIzNDU2NzgifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc2NjM3MzM1NX1dLCJzZXNzaW9uX2lkIjoiNmUyMTZjODAtM2UxMy00NTA1LThjYTYtOTJmMGZkYzVhNzhmIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.jBY3OB68o1Dq0StYQ6WQByg62d8Hc-MiY4NvzreHvQM
+@client1Token = eyJhbGciOiJIUzI1NiIsImtpZCI6ImdiZUI1RnhPdjRsakNuUkUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3FqZnlnanRvbmRsanl3aGJxYmZqLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyZGY1OGE1Yi1kNzMwLTQwODktODRmOS02MzkxZDJkMTQ4MjAiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzY2Mzc3MDAyLCJpYXQiOjE3NjYzNzM0MDIsImVtYWlsIjoiamVhbi5kdXBvbnRAZXhhbXBsZS5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiSmVhbiIsImxhc3RfbmFtZSI6IkR1cG9udCIsInBob25lIjoiKzIyNDYxMjM0NTY3OCJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzY2MzczNDAyfV0sInNlc3Npb25faWQiOiI4NzA4N2IyOS04OTExLTQzYTUtODAzYi0zNzcyMjZlODU4OGQiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.7n1Ox2YVq998L4eeHBTbmFZJS7QK71EJc6Z7mYPHDxQ
+@client2Token = eyJhbGciOiJIUzI1NiIsImtpZCI6ImdiZUI1RnhPdjRsakNuUkUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3FqZnlnanRvbmRsanl3aGJxYmZqLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIzNTgyODc2NS1iN2YwLTQ5NzgtYTEwMC0xZmI0OWRjYTE1NzMiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzY2Mzc3MDM4LCJpYXQiOjE3NjYzNzM0MzgsImVtYWlsIjoibWFyaWUubWFydGluQGV4YW1wbGUuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6Ik1hcmllIiwibGFzdF9uYW1lIjoiTWFydGluIiwicGhvbmUiOiIrMjI0NjEyMzQ1Njc5In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NjYzNzM0Mzh9XSwic2Vzc2lvbl9pZCI6Ijc3ZmJlYmQ4LWNmMmEtNDVlMy04YjM4LTY3YTljNmM0ODY3YSIsImlzX2Fub255bW91cyI6ZmFsc2V9.Bo0n-uT8ufKX6sWBeRfK-5GLa1Kp9k-8mpSOi8rk_ZY
+### ============================================
+### ÉTAPE 1: CRÉER DES CLIENTS
+### ============================================
+
+### Client 1 - Jean Dupont
+POST {{baseUrl}}/auth-register
+Content-Type: application/json
+
+{
+  "email": "jean.dupont@example.com",
+  "password": "password123",
+  "first_name": "Jean",
+  "last_name": "Dupont",
+  "phone": "+224612345678",
+  "company_name": "Dupont & Associés",
+  "address": "123 Avenue de la République",
+  "city": "Conakry",
+  "preferences": {
+    "preferred_style": "moderne",
+    "budget_range": "moyen"
+  }
+}
+
+### Client 2 - Marie Martin
+POST {{baseUrl}}/auth-register
+Content-Type: application/json
+
+{
+  "email": "marie.martin@example.com",
+  "password": "password123",
+  "first_name": "Marie",
+  "last_name": "Martin",
+  "phone": "+224612345679",
+  "company_name": "Martin Events",
+  "address": "456 Boulevard du Commerce",
+  "city": "Conakry"
+}
+
+### Client 3 - Amadou Diallo
+POST {{baseUrl}}/auth-register
+Content-Type: application/json
+
+{
+  "email": "amadou.diallo@example.com",
+  "password": "password123",
+  "first_name": "Amadou",
+  "last_name": "Diallo",
+  "phone": "+224612345680",
+  "address": "789 Rue de la Paix",
+  "city": "Kindia"
+}
+
+### ============================================
+### ÉTAPE 2: SE CONNECTER POUR OBTENIR LES TOKENS
+### ============================================
+### ⚠️ IMPORTANT: Les tokens JWT expirent après 1 heure.
+### Après chaque login, copiez le token de la réponse dans les variables ci-dessus.
+### Format de la réponse: { "data": { "access_token": "..." } }
+### Remplacez @adminToken, @client1Token, @client2Token avec les nouveaux tokens.
+
+### Login Admin
+POST {{baseUrl}}/auth-login
+Content-Type: application/json
+
+{
+  "email": "admin@empire-events.com",
+  "password": "Admin123456"
+}
+
+### Login Client 1 (Jean Dupont)
+POST {{baseUrl}}/auth-login
+Content-Type: application/json
+
+{
+  "email": "jean.dupont@example.com",
+  "password": "password123"
+}
+
+### Login Client 2 (Marie Martin)
+POST {{baseUrl}}/auth-login
+Content-Type: application/json
+
+{
+  "email": "marie.martin@example.com",
+  "password": "password123"
+}
+
+### ============================================
+### ÉTAPE 3: CRÉER DES ÉVÉNEMENTS
+### ============================================
+
+### Événement 1 - Mariage (Client 1)
+POST {{baseUrl}}/events-create-event
+Authorization: Bearer {{client1Token}}
+Content-Type: application/json
+
+{
+  "event_type": "mariage_moderne",
+  "event_category": "prive_familial",
+  "title": "Mariage de Jean et Sophie",
+  "event_date": "2025-12-25T18:00:00Z",
+  "guest_count": 200,
+  "budget_min": 10000000,
+  "budget_max": 15000000,
+  "style": "moderne",
+  "is_hybrid": false,
+  "description": "Grand mariage avec réception"
+}
+
+### Événement 2 - Séminaire (Client 2)
+POST {{baseUrl}}/events-create-event
+Authorization: Bearer {{client2Token}}
+Content-Type: application/json
+
+{
+  "event_type": "seminaire",
+  "event_category": "corporate_professionnel",
+  "title": "Séminaire de Formation Entreprise",
+  "event_date": "2025-12-26T09:00:00Z",
+  "guest_count": 80,
+  "budget_min": 5000000,
+  "budget_max": 8000000,
+  "style": "moderne",
+  "is_hybrid": true,
+  "description": "Formation pour les employés"
+}
+
+### Événement 3 - Anniversaire (Client 1)
+POST {{baseUrl}}/events-create-event
+Authorization: Bearer {{client1Token}}
+Content-Type: application/json
+
+{
+  "event_type": "anniversaire_adulte",
+  "event_category": "prive_familial",
+  "title": "50ème Anniversaire de Jean",
+  "event_date": "2025-12-30T19:00:00Z",
+  "guest_count": 100,
+  "budget_min": 3000000,
+  "budget_max": 5000000,
+  "style": "luxe",
+  "is_hybrid": false
+}
+
+### Événement 4 - Conférence (Client 3)
+POST {{baseUrl}}/events-create-event
+Authorization: Bearer {{client3Token}}
+Content-Type: application/json
+
+{
+  "event_type": "conference",
+  "event_category": "corporate_professionnel",
+  "title": "Conférence Tech 2025",
+  "event_date": "2025-08-25T10:00:00Z",
+  "guest_count": 150,
+  "budget_min": 8000000,
+  "budget_max": 12000000,
+  "style": "moderne",
+  "is_hybrid": true
+}
+
+### ============================================
+### ÉTAPE 4: CRÉER DES LIEUX (VENUES)
+### Note: Ces données doivent être créées directement en SQL
+### car il n'y a pas de fonction Edge pour créer des venues
+### ============================================
+
+### SQL à exécuter dans Supabase SQL Editor:
+/*
+INSERT INTO venues (name, address, city, capacity_max, capacity_min, price_per_hour, description, amenities, is_available) VALUES
+('Salle des Fêtes Conakry', '123 Avenue de la République', 'Conakry', 300, 50, 500000, 'Grande salle pour événements', '["parking", "climatisation", "sonorisation"]', true),
+('Hôtel Palm Beach', '456 Boulevard du Commerce', 'Conakry', 200, 30, 800000, 'Hôtel de luxe avec salle de réception', '["parking", "climatisation", "wifi", "restaurant"]', true),
+('Centre de Conférences Alpha', '789 Rue de la Paix', 'Conakry', 500, 100, 1000000, 'Centre moderne pour conférences', '["parking", "climatisation", "wifi", "projecteur", "sonorisation"]', true),
+('Jardin Événementiel', '321 Avenue de la Liberté', 'Kindia', 150, 20, 300000, 'Jardin pour événements en plein air', '["parking", "éclairage", "toilettes"]', true),
+('Salle Polyvalente', '654 Rue du Marché', 'Conakry', 100, 15, 200000, 'Petite salle pour événements intimes', '["climatisation", "wifi"]', true);
+*/
+
+### ============================================
+### ÉTAPE 5: CRÉER DES SERVICES
+### Note: Ces données doivent être créées directement en SQL
+### ============================================
+
+### SQL à exécuter dans Supabase SQL Editor:
+/*
+INSERT INTO services (name, service_type, description, base_price, is_available) VALUES
+('Traiteur Premium', 'catering', 'Service de restauration haut de gamme', 50000, true),
+('Photographe Professionnel', 'photography', 'Photographie et vidéo pour événements', 300000, true),
+('DJ et Sonorisation', 'entertainment', 'Animation musicale et équipement son', 200000, true),
+('Décoration Florale', 'decoration', 'Arrangements floraux et décoration', 150000, true),
+('Service de Sécurité', 'security', 'Agents de sécurité pour événements', 100000, true),
+('Transport VIP', 'transport', 'Service de transport pour invités', 250000, true),
+('Animation Enfants', 'entertainment', 'Activités et garde pour enfants', 80000, true),
+('Éclairage Professionnel', 'decoration', 'Installation et gestion éclairage', 120000, true);
+*/
+
+### ============================================
+### ÉTAPE 6: CRÉER DES PROVIDERS
+### Note: Ces données doivent être créées directement en SQL
+### ============================================
+
+### SQL à exécuter dans Supabase SQL Editor:
+/*
+INSERT INTO providers (name, email, phone, service_type, address, city, rating, is_available) VALUES
+('Traiteur Deluxe', 'contact@traiteur-deluxe.com', '+224612345700', 'catering', '100 Rue Gaston', 'Conakry', 4.8, true),
+('Studio Photo Pro', 'info@studiophoto.com', '+224612345701', 'photography', '200 Avenue Alpha', 'Conakry', 4.9, true),
+('DJ Sound System', 'dj@soundsystem.com', '+224612345702', 'entertainment', '300 Boulevard Beta', 'Conakry', 4.7, true),
+('Fleurs & Décoration', 'contact@fleurs-deco.com', '+224612345703', 'decoration', '400 Rue Gamma', 'Conakry', 4.6, true),
+('Sécurité Plus', 'securite@plus.com', '+224612345704', 'security', '500 Avenue Delta', 'Conakry', 4.5, true);
+*/
+
+### ============================================
+### ÉTAPE 7: RÉSERVER DES LIEUX POUR LES ÉVÉNEMENTS
+### ============================================
+
+### Réserver lieu pour Événement 1 (Mariage)
+POST {{baseUrl}}/venues-reserve-venue
+Authorization: Bearer {{client1Token}}
+Content-Type: application/json
+
+{
+  "event_id": "5236dc52-a5de-4c04-970d-1e06ec3d69b8",
+  "venue_id": "f601c9a3-337c-4a29-9871-f79aa54ec6b9"
+}
+
+### Réserver lieu pour Événement 2 (Séminaire)
+### Note: La date utilisée sera celle de l'événement (event_date).
+POST {{baseUrl}}/venues-reserve-venue
+Authorization: Bearer {{client2Token}}
+Content-Type: application/json
+
+{
+  "event_id": "EVENT_2_ID",
+  "venue_id": "VENUE_2_ID"
+}
+
+### ============================================
+### ÉTAPE 8: AJOUTER DES SERVICES AUX ÉVÉNEMENTS
+### ============================================
+
+### Ajouter Traiteur à Événement 1
+POST {{baseUrl}}/services-add-service-to-event
+Authorization: Bearer {{client1Token}}
+Content-Type: application/json
+
+{
+  "event_id": "5236dc52-a5de-4c04-970d-1e06ec3d69b8",
+  "service_id": "0596a5de-a33d-4ed1-8c8e-9c2805eeb05f",
+  "provider_id": "92020996-9797-4291-a6b1-00afcb4308a0",
+  "quantity": 200,
+  "unit_price": 50000,
+  "configuration": {
+    "menu_type": "premium",
+    "dietary_restrictions": ["végétarien", "sans gluten"]
+  }
+}
+
+### Ajouter Photographe à Événement 1
+POST {{baseUrl}}/services-add-service-to-event
+Authorization: Bearer {{client1Token}}
+Content-Type: application/json
+
+{
+  "event_id": "EVENT_1_ID",
+  "service_id": "SERVICE_2_ID",
+  "provider_id": "PROVIDER_2_ID",
+  "quantity": 1,
+  "unit_price": 300000,
+  "configuration": {
+    "duration": "8 heures",
+    "deliverables": ["photos", "vidéo", "album"]
+  }
+}
+
+### Ajouter DJ à Événement 1
+POST {{baseUrl}}/services-add-service-to-event
+Authorization: Bearer {{client1Token}}
+Content-Type: application/json
+
+{
+  "event_id": "EVENT_1_ID",
+  "service_id": "SERVICE_3_ID",
+  "provider_id": "PROVIDER_3_ID",
+  "quantity": 1,
+  "unit_price": 200000,
+  "configuration": {
+    "duration": "6 heures",
+    "equipment": ["sonorisation", "éclairage", "micro"]
+  }
+}
+
+### Ajouter Décoration à Événement 1
+POST {{baseUrl}}/services-add-service-to-event
+Authorization: Bearer {{client1Token}}
+Content-Type: application/json
+
+{
+  "event_id": "EVENT_1_ID",
+  "service_id": "SERVICE_4_ID",
+  "provider_id": "PROVIDER_4_ID",
+  "quantity": 1,
+  "unit_price": 150000,
+  "configuration": {
+    "theme": "moderne",
+    "colors": ["blanc", "or", "rose"]
+  }
+}
+
+### Ajouter Traiteur à Événement 2
+POST {{baseUrl}}/services-add-service-to-event
+Authorization: Bearer {{client2Token}}
+Content-Type: application/json
+
+{
+  "event_id": "EVENT_2_ID",
+  "service_id": "SERVICE_1_ID",
+  "provider_id": "PROVIDER_1_ID",
+  "quantity": 80,
+  "unit_price": 50000,
+  "configuration": {
+    "menu_type": "business",
+    "coffee_break": true
+  }
+}
+
+### ============================================
+### ÉTAPE 9: CRÉER DES DEVIS
+### ============================================
+
+### Devis pour Événement 1
+POST {{baseUrl}}/quotes-create-quote
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "event_id": "9e580a47-93ae-4a84-9112-eb2d6789a136",
+  "items": [
+    {
+      "description": "Traiteur Premium pour 200 personnes",
+      "quantity": 200,
+      "unit_price": 50000,
+      "total_price": 10000000
+    },
+    {
+      "description": "Photographe Professionnel - Package complet",
+      "quantity": 1,
+      "unit_price": 300000,
+      "total_price": 300000
+    },
+    {
+      "description": "DJ et Sonorisation - 6 heures",
+      "quantity": 1,
+      "unit_price": 200000,
+      "total_price": 200000
+    },
+    {
+      "description": "Décoration Florale - Thème moderne",
+      "quantity": 1,
+      "unit_price": 150000,
+      "total_price": 150000
+    }
+  ],
+  "validity_date": "2025-04-15T00:00:00Z",
+  "notes": "Devis pour mariage premium"
+}
+
+### Devis pour Événement 2
+POST {{baseUrl}}/quotes-create-quote
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "event_id": "EVENT_2_ID",
+  "items": [
+    {
+      "description": "Traiteur Business pour 80 personnes",
+      "quantity": 80,
+      "unit_price": 50000,
+      "total_price": 4000000
+    }
+  ],
+  "validity_date": "2025-04-20T00:00:00Z",
+  "notes": "Devis pour séminaire entreprise"
+}
+
+### ============================================
+### ÉTAPE 10: ENVOYER LES DEVIS
+### ============================================
+
+### Envoyer Devis 1
+POST {{baseUrl}}/quotes-send-quote
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "quote_id": "6bbe97d5-7726-47f5-b22b-8307a45c7718"
+}
+
+### Envoyer Devis 2
+POST {{baseUrl}}/quotes-send-quote
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "quote_id": "QUOTE_2_ID"
+}
+
+### ============================================
+### ÉTAPE 11: ACCEPTER/REJETER LES DEVIS
+### ============================================
+
+### Accepter Devis 1
+POST {{baseUrl}}/quotes-accept-quote
+Authorization: Bearer {{client1Token}}
+Content-Type: application/json
+
+{
+  "quote_id": "6bbe97d5-7726-47f5-b22b-8307a45c7718"
+}
+
+### Rejeter Devis 2 (exemple)
+# POST {{baseUrl}}/quotes-reject-quote
+# Authorization: Bearer {{client2Token}}
+# Content-Type: application/json
+#
+# {
+#   "quote_id": "QUOTE_2_ID",
+#   "reason": "Budget trop élevé"
+# }
+
+### ============================================
+### ÉTAPE 12: AJOUTER DES INVITÉS
+### ============================================
+
+### Ajouter invités à Événement 1
+POST {{baseUrl}}/guests-add-guests
+Authorization: Bearer {{client1Token}}
+Content-Type: application/json
+
+{
+  "event_id": "5236dc52-a5de-4c04-970d-1e06ec3d69b8",
+  "guests": [
+    {
+      "first_name": "Sophie",
+      "last_name": "Dupont",
+      "email": "sophie.dupont@example.com",
+      "phone": "+224612345690",
+      "is_vip": true
+    },
+    {
+      "first_name": "Pierre",
+      "last_name": "Martin",
+      "email": "pierre.martin@example.com",
+      "phone": "+224612345691",
+      "is_vip": false
+    },
+    {
+      "first_name": "Claire",
+      "last_name": "Bernard",
+      "email": "claire.bernard@example.com",
+      "phone": "+224612345692",
+      "is_vip": false
+    },
+    {
+      "first_name": "Thomas",
+      "last_name": "Petit",
+      "email": "thomas.petit@example.com",
+      "phone": "+224612345693",
+      "is_vip": false
+    },
+    {
+      "first_name": "Emma",
+      "last_name": "Durand",
+      "email": "emma.durand@example.com",
+      "phone": "+224612345694",
+      "is_vip": true
+    }
+  ]
+}
+
+### Ajouter invités à Événement 2
+POST {{baseUrl}}/guests-add-guests
+Authorization: Bearer {{client2Token}}
+Content-Type: application/json
+
+{
+  "event_id": "EVENT_2_ID",
+  "guests": [
+    {
+      "first_name": "Marc",
+      "last_name": "Lefebvre",
+      "email": "marc.lefebvre@example.com",
+      "phone": "+224612345695",
+      "is_vip": false
+    },
+    {
+      "first_name": "Julie",
+      "last_name": "Moreau",
+      "email": "julie.moreau@example.com",
+      "phone": "+224612345696",
+      "is_vip": false
+    }
+  ]
+}
+
+### ============================================
+### ÉTAPE 13: ENVOYER LES INVITATIONS
+### ============================================
+
+### Envoyer invitations pour Événement 1
+POST {{baseUrl}}/guests-send-invitations
+Authorization: Bearer {{client1Token}}
+Content-Type: application/json
+
+{
+  "event_id": "5236dc52-a5de-4c04-970d-1e06ec3d69b8",
+  "template_id": "default",
+  "custom_message": "Nous serions ravis de vous compter parmi nous pour notre mariage!"
+}
+
+### Envoyer invitations pour Événement 2
+POST {{baseUrl}}/guests-send-invitations
+Authorization: Bearer {{client2Token}}
+Content-Type: application/json
+
+{
+  "event_id": "EVENT_2_ID",
+  "template_id": "default",
+  "custom_message": "Vous êtes cordialement invité à notre séminaire de formation."
+}
+
+### ============================================
+### ÉTAPE 14: RSVP DES INVITÉS
+### ============================================
+
+### RSVP - Accepter (Invité 1)
+POST {{baseUrl}}/guests-rsvp
+Content-Type: application/json
+
+{
+  "token": "4720534196f31c38bbc32ca2c4825aea35498314d77ff09820bc6cede632b1af",
+  "rsvp_status": "accepted",
+  "dietary_restrictions": ["végétarien"]
+}
+
+### RSVP - Accepter (Invité 2)
+POST {{baseUrl}}/guests-rsvp
+Content-Type: application/json
+
+{
+  "token": "INVITATION_TOKEN_2",
+  "rsvp_status": "accepted"
+}
+
+### RSVP - Refuser (Invité 3)
+POST {{baseUrl}}/guests-rsvp
+Content-Type: application/json
+
+{
+  "token": "INVITATION_TOKEN_3",
+  "rsvp_status": "declined",
+  "reason": "Empêchement familial"
+}
+
+### RSVP - Peut-être (Invité 4)
+POST {{baseUrl}}/guests-rsvp
+Content-Type: application/json
+
+{
+  "token": "INVITATION_TOKEN_4",
+  "rsvp_status": "maybe"
+}
+
+### ============================================
+### ÉTAPE 15: CRÉER DES INTENTIONS DE PAIEMENT
+### ============================================
+
+### Créer intention de paiement pour Événement 1
+POST {{baseUrl}}/payments-create-payment-intent
+Authorization: Bearer {{client1Token}}
+Content-Type: application/json
+
+{
+  "event_id": "5236dc52-a5de-4c04-970d-1e06ec3d69b8",
+  "amount": 10650000,
+  "currency": "GNF",
+  "payment_method": "mobile_money",
+  "description": "Acompte pour mariage"
+}
+
+### Créer intention de paiement pour Événement 2
+POST {{baseUrl}}/payments-create-payment-intent
+Authorization: Bearer {{client2Token}}
+Content-Type: application/json
+
+{
+  "event_id": "EVENT_2_ID",
+  "amount": 4000000,
+  "currency": "GNF",
+  "payment_method": "bank_transfer",
+  "description": "Paiement séminaire"
+}
+
+### ============================================
+### ÉTAPE 16: CONFIRMER LES PAIEMENTS
+### ============================================
+
+### Confirmer paiement 1
+POST {{baseUrl}}/payments-confirm-payment
+Authorization: Bearer {{client1Token}}
+Content-Type: application/json
+
+{
+  "payment_intent_id": "a5029f54-29d3-434a-b8dd-02729a291314",
+  "transaction_id": "TXN_123456789",
+  "payment_proof_url": "https://example.com/proof1.pdf"
+}
+
+### Confirmer paiement 2
+POST {{baseUrl}}/payments-confirm-payment
+Authorization: Bearer {{client2Token}}
+Content-Type: application/json
+
+{
+  "payment_intent_id": "PAYMENT_INTENT_2_ID",
+  "transaction_id": "TXN_987654321",
+  "payment_proof_url": "https://example.com/proof2.pdf"
+}
+
+### ============================================
+### ÉTAPE 17: ENVOYER DES MESSAGES
+### ============================================
+
+### Message Client 1 vers Admin
+POST {{baseUrl}}/messages-send-message
+Authorization: Bearer {{client1Token}}
+Content-Type: application/json
+
+{
+  "event_id": "5236dc52-a5de-4c04-970d-1e06ec3d69b8",
+  "recipient_id": "c6b31fc8-4a2e-402c-b7e0-8827c6ce3d3e",
+  "subject": "Question sur le menu",
+  "content": "Bonjour, j'aimerais savoir si nous pouvons modifier le menu pour inclure plus d'options végétariennes."
+}
+
+### Message Admin vers Client 1
+POST {{baseUrl}}/messages-send-message
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "event_id": "EVENT_1_ID",
+  "recipient_id": "CLIENT_1_ID",
+  "subject": "Re: Question sur le menu",
+  "content": "Bien sûr! Nous pouvons ajouter plus d'options végétariennes. Je vous enverrai un menu révisé demain."
+}
+
+### Message Client 2 vers Admin
+POST {{baseUrl}}/messages-send-message
+Authorization: Bearer {{client2Token}}
+Content-Type: application/json
+
+{
+  "event_id": "EVENT_2_ID",
+  "recipient_id": "ADMIN_ID",
+  "subject": "Demande de changement de date",
+  "content": "Serait-il possible de déplacer le séminaire au 25 mai?"
+}
+
+### ============================================
+### ÉTAPE 18: CRÉER DES NOTIFICATIONS
+### ============================================
+
+### Notification pour Client 1
+POST {{baseUrl}}/notifications-create-notification
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "user_id": "35828765-b7f0-4978-a100-1fb49dca1573",
+  "event_id": "5236dc52-a5de-4c04-970d-1e06ec3d69b8",
+  "type": "quote_sent",
+  "title": "Devis envoyé",
+  "message": "Votre devis pour le mariage a été envoyé. Veuillez le consulter et nous faire part de votre décision."
+}
+
+### Notification globale (pour tous les admins)
+POST {{baseUrl}}/notifications-create-notification
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "user_id": null,
+  "event_id": "EVENT_1_ID",
+  "type": "event_created",
+  "title": "Nouvel événement créé",
+  "message": "Un nouvel événement 'Mariage de Jean et Sophie' a été créé par Jean Dupont."
+}
+
+### ============================================
+### ÉTAPE 19: REQUÊTES DE LECTURE (GET)
+### ============================================
+
+### Récupérer tous les événements (Admin)
+GET {{baseUrl}}/events-get-events?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+### Récupérer les événements d'un client
+GET {{baseUrl}}/events-get-events?page=1&limit=10
+Authorization: Bearer {{client1Token}}
+
+### Récupérer les détails d'un événement
+GET {{baseUrl}}/events-get-event-details?event_id=5236dc52-a5de-4c04-970d-1e06ec3d69b8
+Authorization: Bearer {{client1Token}}
+
+### Récupérer un devis
+GET {{baseUrl}}/quotes-get-quote?quote_id=6bbe97d5-7726-47f5-b22b-8307a45c7718
+Authorization: Bearer {{client1Token}}
+
+### Récupérer la liste des invités
+GET {{baseUrl}}/guests-get-guest-list?event_id=5236dc52-a5de-4c04-970d-1e06ec3d69b8
+Authorization: Bearer {{client1Token}}
+
+### Récupérer l'historique des paiements
+GET {{baseUrl}}/payments-get-payment-history?event_id=5236dc52-a5de-4c04-970d-1e06ec3d69b8
+Authorization: Bearer {{client1Token}}
+
+### Récupérer les messages
+GET {{baseUrl}}/messages-get-messages?event_id=5236dc52-a5de-4c04-970d-1e06ec3d69b8
+Authorization: Bearer {{client1Token}}
+
+### Récupérer les services disponibles
+GET {{baseUrl}}/services-get-services?service_type=gestion_invites
+Authorization: Bearer {{client1Token}}
+
+### Récupérer les lieux disponibles
+GET {{baseUrl}}/venues-get-venues?city=Conakry
+Authorization: Bearer {{client1Token}}
+
+### Vérifier disponibilité d'un lieu
+GET {{baseUrl}}/venues-check-availability?venue_id=18c7f585-7750-43ea-93c5-5813b72675cf&date=2025-12-22
+Authorization: Bearer {{client1Token}}
+
+### Dashboard Admin - Statistiques
+GET {{baseUrl}}/admin-dashboard-stats
+Authorization: Bearer {{adminToken}}
+
+### Admin - Tous les événements
+GET {{baseUrl}}/admin-get-all-events?page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### ============================================
+### NOTES IMPORTANTES
+### ============================================
+###
+### 1. Remplacez tous les IDs (EVENT_1_ID, CLIENT_1_ID, etc.) par les vrais IDs
+###    retournés par les requêtes précédentes
+###
+### 2. Remplacez les tokens ({{adminToken}}, {{client1Token}}, etc.) par les vrais tokens
+###    obtenus via les requêtes de login
+###
+### 3. Pour créer les venues, services et providers, utilisez le SQL Editor de Supabase
+###    car il n'y a pas de fonctions Edge pour ces entités
+###
+### 4. L'ordre des requêtes suit le flux logique de l'application
+###
+### 5. Certaines requêtes dépendent des résultats des précédentes
+###    (ex: créer un devis nécessite un événement existant)
+###
+### ============================================
+

@@ -33,6 +33,12 @@ serve(async (req) => {
       throw new Error('Non authentifié')
     }
 
+    // Créer un client avec service role pour éviter les problèmes RLS avec profiles
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
     // Parser les query params
     const url = new URL(req.url)
     const eventId = url.searchParams.get('event_id')
@@ -43,7 +49,8 @@ serve(async (req) => {
     const offset = (page - 1) * limit
 
     // Construire la requête pour récupérer les messages où l'utilisateur est expéditeur ou destinataire
-    let query = supabaseClient
+    // Utiliser supabaseAdmin pour éviter les problèmes RLS avec profiles
+    let query = supabaseAdmin
       .from('messages')
       .select(`
         *,

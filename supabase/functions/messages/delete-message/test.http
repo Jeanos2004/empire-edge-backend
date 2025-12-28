@@ -1,0 +1,12 @@
+### ============================================
+### MESSAGES DELETE MESSAGE
+### ============================================
+
+### Test
+POST {baseUrl}/messages-delete-message
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

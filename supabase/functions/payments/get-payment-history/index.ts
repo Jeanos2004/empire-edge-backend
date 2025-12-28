@@ -33,15 +33,21 @@ serve(async (req) => {
       throw new Error('Non authentifié')
     }
 
+    // Créer un client avec service role pour récupérer le profil (évite les problèmes RLS)
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
     // Récupérer le profil
-    const { data: profile } = await supabaseClient
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single()
 
-    if (!profile) {
-      throw new Error('Profil introuvable')
+    if (profileError || !profile) {
+      throw new Error(`Profil introuvable: ${profileError?.message || 'Profil non trouvé'}`)
     }
 
     // Parser les query params
@@ -52,8 +58,8 @@ serve(async (req) => {
     const limit = parseInt(url.searchParams.get('limit') || '20')
     const offset = (page - 1) * limit
 
-    // Construire la requête
-    let query = supabaseClient
+    // Construire la requête (utiliser supabaseAdmin pour éviter RLS)
+    let query = supabaseAdmin
       .from('payments')
       .select(`
         *,
@@ -65,18 +71,19 @@ serve(async (req) => {
     if (eventId) {
       query = query.eq('event_id', eventId)
     } else if (profile.role === 'client') {
+      // Les admins peuvent accéder à toutes les ressources
       // Les clients voient seulement leurs paiements
-      const { data: client } = await supabaseClient
+      const { data: client } = await supabaseAdmin
         .from('clients')
-        .select('profile_id')
+        .select('id, profile_id')
         .eq('profile_id', user.id)
         .single()
 
       if (client) {
-        const { data: clientEvents } = await supabaseClient
+        const { data: clientEvents } = await supabaseAdmin
           .from('events')
           .select('id')
-          .eq('client_id', client.profile_id)
+          .eq('client_id', client.id)
 
         if (clientEvents && clientEvents.length > 0) {
           const eventIds = clientEvents.map(e => e.id)
@@ -132,9 +139,9 @@ serve(async (req) => {
 
     payments?.forEach((payment) => {
       stats.total += payment.amount || 0
-      if (payment.status === 'paid') {
+      if (payment.status === 'paye') {
         stats.paid += payment.amount || 0
-      } else if (payment.status === 'pending') {
+      } else if (payment.status === 'en_attente' || payment.status === 'acompte_recu' || payment.status === 'partiellement_paye') {
         stats.pending += payment.amount || 0
         if (payment.due_date && new Date(payment.due_date) < new Date()) {
           stats.overdue += payment.amount || 0

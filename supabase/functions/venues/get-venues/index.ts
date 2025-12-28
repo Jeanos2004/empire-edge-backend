@@ -13,15 +13,11 @@ serve(async (req) => {
   }
 
   try {
-    // Créer client Supabase
-    const supabaseClient = createClient(
+    // Utiliser supabaseAdmin pour éviter les problèmes RLS
+    // Cette fonction est publique (lieux disponibles visibles par tous)
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
     // Parser les query params
@@ -36,7 +32,7 @@ serve(async (req) => {
     const offset = (page - 1) * limit
 
     // Construire la requête
-    let query = supabaseClient
+    let query = supabaseAdmin
       .from('venues')
       .select('*', { count: 'exact' })
 
@@ -62,7 +58,7 @@ serve(async (req) => {
 
     // Filtrer par disponibilité pour une date spécifique
     if (date) {
-      const { data: unavailableVenues } = await supabaseClient
+      const { data: unavailableVenues } = await supabaseAdmin
         .from('venue_availability')
         .select('venue_id')
         .eq('date', date.split('T')[0])

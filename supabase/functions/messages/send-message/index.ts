@@ -33,7 +33,13 @@ serve(async (req) => {
       throw new Error('Non authentifié')
     }
 
-    // Parser le body
+    // Créer un client avec service role pour récupérer le profil (évite les problèmes RLS)
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
+    // Vérifier que le destinataire existe
     const body = await req.json()
 
     if (!body.recipient_id) {
@@ -44,8 +50,8 @@ serve(async (req) => {
       throw new Error('content est requis')
     }
 
-    // Vérifier que le destinataire existe
-    const { data: recipient, error: recipientError } = await supabaseClient
+    // Vérifier que le destinataire existe (utiliser supabaseAdmin pour éviter RLS)
+    const { data: recipient, error: recipientError } = await supabaseAdmin
       .from('profiles')
       .select('id')
       .eq('id', body.recipient_id)
@@ -55,46 +61,34 @@ serve(async (req) => {
       throw new Error('Destinataire introuvable')
     }
 
-    // Vérifier que l'événement existe si fourni
-    if (body.event_id) {
-      const { data: event, error: eventError } = await supabaseClient
-        .from('events')
-        .select('id')
-        .eq('id', body.event_id)
-        .single()
-
-      if (eventError || !event) {
-        throw new Error('Événement introuvable')
-      }
-    }
-
     // Créer le message
-    const { data: message, error: insertError } = await supabaseClient
+    const { data: message, error: messageError } = await supabaseClient
       .from('messages')
       .insert({
+        event_id: body.event_id || null,
         sender_id: user.id,
         recipient_id: body.recipient_id,
-        event_id: body.event_id || null,
         subject: body.subject || null,
         content: body.content,
         is_read: false,
+        parent_message_id: body.parent_message_id || null,
       })
       .select()
       .single()
 
-    if (insertError) {
-      throw new Error(`Erreur lors de l'envoi du message: ${insertError.message}`)
+    if (messageError) {
+      throw new Error(`Erreur lors de l'envoi du message: ${messageError.message}`)
     }
 
     // Créer une notification pour le destinataire
-    await supabaseClient
+    await supabaseAdmin
       .from('notifications')
       .insert({
         user_id: body.recipient_id,
         event_id: body.event_id || null,
         type: 'new_message',
-        title: body.subject || 'Nouveau message',
-        message: body.content.substring(0, 100) + (body.content.length > 100 ? '...' : ''),
+        title: 'Nouveau message',
+        message: `Vous avez reçu un nouveau message${body.subject ? `: ${body.subject}` : ''}`,
         is_read: false,
       })
 
@@ -122,4 +116,3 @@ serve(async (req) => {
     )
   }
 })
-

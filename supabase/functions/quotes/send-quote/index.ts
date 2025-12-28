@@ -33,15 +33,25 @@ serve(async (req) => {
       throw new Error('Non authentifié')
     }
 
+    // Créer un client avec service role pour récupérer le profil (évite les problèmes RLS)
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
     // Récupérer le profil
-    const { data: profile } = await supabaseClient
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single()
 
+    if (profileError) {
+      throw new Error(`Erreur lors de la récupération du profil: ${profileError.message}`)
+    }
+
     if (!profile) {
-      throw new Error('Profil introuvable')
+      throw new Error(`Profil introuvable pour l'utilisateur ${user.id}. Assurez-vous que le profil existe dans la table profiles.`)
     }
 
     // Seuls les admins peuvent envoyer des devis
@@ -56,25 +66,50 @@ serve(async (req) => {
       throw new Error('quote_id est requis')
     }
 
-    // Vérifier que le devis existe
-    const { data: quote, error: quoteError } = await supabaseClient
+    // Vérifier que le devis existe (utiliser supabaseAdmin pour éviter RLS)
+    // D'abord récupérer le devis de base
+    const { data: quoteBase, error: quoteBaseError } = await supabaseAdmin
       .from('quotes')
-      .select(`
-        *,
-        events(
-          id,
-          client_id,
-          clients!inner(
-            profile_id,
-            profiles!inner(email, first_name, last_name)
-          )
-        )
-      `)
+      .select('*')
       .eq('id', body.quote_id)
       .single()
 
-    if (quoteError || !quote) {
-      throw new Error('Devis introuvable')
+    if (quoteBaseError || !quoteBase) {
+      throw new Error(`Devis introuvable: ${quoteBaseError?.message || 'Devis non trouvé avec l\'ID ' + body.quote_id}`)
+    }
+
+    // Ensuite récupérer l'événement
+    const { data: event, error: eventError } = await supabaseAdmin
+      .from('events')
+      .select('id, client_id')
+      .eq('id', quoteBase.event_id)
+      .single()
+
+    if (eventError || !event) {
+      throw new Error(`Événement introuvable pour le devis: ${eventError?.message || 'Événement non trouvé'}`)
+    }
+
+    // Récupérer le client et son profil
+    const { data: client, error: clientError } = await supabaseAdmin
+      .from('clients')
+      .select(`
+        id,
+        profile_id,
+        profiles!inner(email, first_name, last_name)
+      `)
+      .eq('id', event.client_id)
+      .single()
+
+    // Combiner les données
+    const quote = {
+      ...quoteBase,
+      events: {
+        ...event,
+        clients: client ? {
+          ...client,
+          profiles: client.profiles
+        } : null
+      }
     }
 
     // Vérifier que le devis n'a pas déjà été envoyé
@@ -83,15 +118,15 @@ serve(async (req) => {
     }
 
     // Vérifier que le devis n'est pas déjà accepté ou rejeté
-    if (quote.status === 'accepted' || quote.status === 'rejected') {
+    if (quote.status === 'accepte' || quote.status === 'refuse') {
       throw new Error(`Impossible d'envoyer un devis avec le statut: ${quote.status}`)
     }
 
-    // Mettre à jour le devis
-    const { data: updatedQuote, error: updateError } = await supabaseClient
+    // Mettre à jour le devis (utiliser supabaseAdmin pour éviter RLS)
+    const { data: updatedQuote, error: updateError } = await supabaseAdmin
       .from('quotes')
       .update({
-        status: 'sent',
+        status: 'envoye',
         sent_at: new Date().toISOString(),
       })
       .eq('id', body.quote_id)
@@ -102,19 +137,23 @@ serve(async (req) => {
       throw new Error(`Erreur lors de l'envoi du devis: ${updateError.message}`)
     }
 
-    // Créer une notification pour le client
+    // Créer une notification pour le client (utiliser supabaseAdmin)
     const clientProfile = quote.events?.clients?.profiles
     if (clientProfile) {
-      await supabaseClient
-        .from('notifications')
-        .insert({
-          user_id: quote.events.client_id,
-          event_id: quote.events.id,
-          type: 'quote_sent',
-          title: 'Nouveau devis reçu',
-          message: `Un nouveau devis (${quote.quote_number}) a été envoyé pour votre événement`,
-          is_read: false,
-        })
+      // Récupérer le profile_id du client pour la notification
+      const clientProfileId = quote.events.clients.profile_id
+      if (clientProfileId) {
+        await supabaseAdmin
+          .from('notifications')
+          .insert({
+            user_id: clientProfileId,
+            event_id: quote.events.id,
+            type: 'quote_sent',
+            title: 'Nouveau devis reçu',
+            message: `Un nouveau devis (${quote.quote_number}) a été envoyé pour votre événement`,
+            is_read: false,
+          })
+      }
 
       // TODO: Envoyer un email au client avec le devis en PDF
       // Utiliser un service d'email (Resend, SendGrid, etc.)

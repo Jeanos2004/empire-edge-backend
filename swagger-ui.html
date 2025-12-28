@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empire Events - API Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-weight: 400;
+        }
+
+        .method-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            min-width: 3.5rem;
+            text-align: center;
+        }
+
+        .method-get { background: #4CAF50; color: white; }
+        .method-post { background: #2196F3; color: white; }
+        .method-put { background: #FF9800; color: white; }
+        .method-delete { background: #F44336; color: white; }
+
+        .json-editor {
+            font-family: 'SF Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+            font-size: 0.8125rem;
+            line-height: 1.6;
+        }
+
+        .response-box {
+            font-family: 'SF Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+            font-size: 0.8125rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .endpoint-toggle {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .endpoint-toggle.open {
+            transform: rotate(180deg);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 0.875rem;
+            height: 0.875rem;
+            border: 2px solid #ff6b35;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .gradient-header {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+        }
+
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: #f5f5f5;
+            border-radius: 3px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #d1d1d1;
+            border-radius: 3px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: #b3b3b3;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-header text-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-8 py-10">
+            <h1 class="text-3xl font-light mb-2 tracking-tight">Empire Events</h1>
+            <p class="text-orange-50 text-sm font-light">Documentation API - Testez toutes les Edge Functions</p>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-8 py-8">
+        <!-- Stats Panel -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-light text-gray-700 mb-2">📊 Statistiques de l'API</h2>
+                    <p class="text-sm text-gray-500" id="api-stats">Chargement...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Configuration Panel -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-8">
+            <h2 class="text-lg font-medium text-gray-700 mb-5 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                Configuration
+            </h2>
+            <div class="space-y-4">
+                <div>
+                    <label for="baseUrl" class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">Base URL</label>
+                    <input 
+                        type="text" 
+                        id="baseUrl" 
+                        value="https://qjfygjtondljywhbqbfj.supabase.co/functions/v1"
+                        class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white text-gray-700"
+                        placeholder="URL de base des Edge Functions"
+                    >
+                </div>
+                <div>
+                    <label for="authToken" class="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">Token d'authentification (JWT)</label>
+                    <input 
+                        type="text" 
+                        id="authToken" 
+                        class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all font-mono bg-white text-gray-700"
+                        placeholder="Collez votre token JWT ici (obtenu via /auth-login)"
+                    >
+                    <p class="mt-1.5 text-xs text-gray-400">Le token expire après 1 heure. Reconnectez-vous pour obtenir un nouveau token.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Endpoints Container -->
+        <div id="endpoints-container"></div>
+    </div>
+
+    <script>
+        const endpoints = [
+            // AUTH
+            {
+                category: "Authentification",
+                method: "POST",
+                path: "/auth-register",
+                description: "Inscription d'un nouveau client",
+                auth: false,
+                params: [],
+                body: {
+                    email: "client@example.com",
+                    password: "password123",
+                    first_name: "Jean",
+                    last_name: "Dupont",
+                    phone: "+224612345678",
+                    company_name: "Entreprise",
+                    address: "123 Rue Example",
+                    city: "Conakry"
+                }
+            },
+            {
+                category: "Authentification",
+                method: "POST",
+                path: "/auth-login",
+                description: "Connexion et obtention d'un token JWT",
+                auth: false,
+                params: [],
+                body: {
+                    email: "admin@empire-events.com",
+                    password: "Admin123456"
+                }
+            },
+            {
+                category: "Authentification",
+                method: "GET",
+                path: "/auth-me",
+                description: "Récupérer le profil de l'utilisateur connecté",
+                auth: true,
+                params: [],
+                body: null
+            },
+            {
+                category: "Authentification",
+                method: "POST",
+                path: "/auth-update-profile",
+                description: "Mise à jour du profil utilisateur",
+                auth: true,
+                params: [],
+                body: {
+                    first_name: "Jean",
+                    last_name: "Dupont",
+                    phone: "+224612345678",
+                    company_name: "Nouvelle Entreprise"
+                }
+            },
+            // EVENTS
+            {
+                category: "Événements",
+                method: "POST",
+                path: "/events-create-event",
+                description: "Créer un nouvel événement",
+                auth: true,
+                params: [],
+                body: {
+                    event_type: "mariage_moderne",
+                    event_category: "prive_familial",
+                    title: "Mariage de Jean et Sophie",
+                    event_date: "2025-12-25T18:00:00Z",
+                    guest_count: 200,
+                    budget_min: 10000000,
+                    budget_max: 15000000,
+                    style: "moderne",
+                    is_hybrid: false,
+                    description: "Grand mariage avec réception"
+                }
+            },
+            {
+                category: "Événements",
+                method: "GET",
+                path: "/events-get-events",
+                description: "Récupérer la liste des événements",
+                auth: true,
+                params: [
+                    { name: "page", type: "number", default: "1" },
+                    { name: "limit", type: "number", default: "10" },
+                    { name: "status", type: "string", default: "" },
+                    { name: "event_type", type: "string", default: "" }
+                ],
+                body: null
+            },
+            {
+                category: "Événements",
+                method: "GET",
+                path: "/events-get-event-details",
+                description: "Récupérer les détails d'un événement",
+                auth: true,
+                params: [
+                    { name: "event_id", type: "string", default: "" }
+                ],
+                body: null
+            },
+            {
+                category: "Événements",
+                method: "POST",
+                path: "/events-update-event",
+                description: "Mettre à jour un événement",
+                auth: true,
+                params: [],
+                body: {
+                    event_id: "",
+                    title: "Nouveau titre",
+                    description: "Nouvelle description"
+                }
+            },
+            {
+                category: "Événements",
+                method: "DELETE",
+                path: "/events-delete-event",
+                description: "Supprimer un événement",
+                auth: true,
+                params: [],
+                body: {
+                    event_id: ""
+                }
+            },
+            // QUOTES
+            {
+                category: "Devis",
+                method: "POST",
+                path: "/quotes-create-quote",
+                description: "Créer un devis (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    event_id: "",
+                    items: [
+                        {
+                            description: "Service 1",
+                            quantity: 1,
+                            unit_price: 100000,
+                            total_price: 100000
+                        }
+                    ],
+                    validity_date: "2025-04-15T00:00:00Z",
+                    notes: "Notes du devis"
+                }
+            },
+            {
+                category: "Devis",
+                method: "GET",
+                path: "/quotes-get-quote",
+                description: "Récupérer un devis",
+                auth: true,
+                params: [
+                    { name: "quote_id", type: "string", default: "" },
+                    { name: "event_id", type: "string", default: "" }
+                ],
+                body: null
+            },
+            {
+                category: "Devis",
+                method: "POST",
+                path: "/quotes-send-quote",
+                description: "Envoyer un devis au client (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    quote_id: ""
+                }
+            },
+            {
+                category: "Devis",
+                method: "POST",
+                path: "/quotes-accept-quote",
+                description: "Accepter un devis",
+                auth: true,
+                params: [],
+                body: {
+                    quote_id: ""
+                }
+            },
+            {
+                category: "Devis",
+                method: "POST",
+                path: "/quotes-reject-quote",
+                description: "Rejeter un devis",
+                auth: true,
+                params: [],
+                body: {
+                    quote_id: "",
+                    reason: "Raison du rejet"
+                }
+            },
+            // SERVICES
+            {
+                category: "Services",
+                method: "GET",
+                path: "/services-get-services",
+                description: "Récupérer la liste des services disponibles",
+                auth: false,
+                params: [
+                    { name: "service_type", type: "string", default: "" },
+                    { name: "is_active", type: "boolean", default: "true" },
+                    { name: "page", type: "number", default: "1" },
+                    { name: "limit", type: "number", default: "50" }
+                ],
+                body: null
+            },
+            {
+                category: "Services",
+                method: "POST",
+                path: "/services-add-service-to-event",
+                description: "Ajouter un service à un événement",
+                auth: true,
+                params: [],
+                body: {
+                    event_id: "",
+                    service_id: "",
+                    provider_id: "",
+                    quantity: 1,
+                    unit_price: 100000,
+                    configuration: {}
+                }
+            },
+            {
+                category: "Services",
+                method: "DELETE",
+                path: "/services-remove-service-from-event",
+                description: "Retirer un service d'un événement",
+                auth: true,
+                params: [],
+                body: {
+                    event_id: "",
+                    service_id: ""
+                }
+            },
+            {
+                category: "Services",
+                method: "POST",
+                path: "/services-create-service",
+                description: "Créer un service (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    service_type: "traiteur_boissons",
+                    name: "Service de traiteur",
+                    description: "Description du service",
+                    base_price: 100000,
+                    is_active: true
+                }
+            },
+            {
+                category: "Services",
+                method: "GET",
+                path: "/services-get-service",
+                description: "Récupérer un service",
+                auth: false,
+                params: [
+                    { name: "service_id", type: "string", default: "" }
+                ],
+                body: null
+            },
+            {
+                category: "Services",
+                method: "POST",
+                path: "/services-update-service",
+                description: "Mettre à jour un service (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    service_id: "",
+                    name: "Nouveau nom",
+                    description: "Nouvelle description"
+                }
+            },
+            {
+                category: "Services",
+                method: "POST",
+                path: "/services-delete-service",
+                description: "Supprimer un service (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    service_id: ""
+                }
+            },
+            // VENUES
+            {
+                category: "Lieux",
+                method: "GET",
+                path: "/venues-get-venues",
+                description: "Récupérer la liste des lieux disponibles",
+                auth: false,
+                params: [
+                    { name: "city", type: "string", default: "" },
+                    { name: "min_capacity", type: "number", default: "" },
+                    { name: "max_capacity", type: "number", default: "" },
+                    { name: "date", type: "string", default: "" },
+                    { name: "page", type: "number", default: "1" },
+                    { name: "limit", type: "number", default: "20" }
+                ],
+                body: null
+            },
+            {
+                category: "Lieux",
+                method: "GET",
+                path: "/venues-check-availability",
+                description: "Vérifier la disponibilité d'un lieu",
+                auth: false,
+                params: [
+                    { name: "venue_id", type: "string", default: "" },
+                    { name: "date", type: "string", default: "" }
+                ],
+                body: null
+            },
+            {
+                category: "Lieux",
+                method: "POST",
+                path: "/venues-reserve-venue",
+                description: "Réserver un lieu pour un événement",
+                auth: true,
+                params: [],
+                body: {
+                    event_id: "",
+                    venue_id: "",
+                    date: ""
+                }
+            },
+            {
+                category: "Lieux",
+                method: "POST",
+                path: "/venues-create-venue",
+                description: "Créer un lieu (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    name: "Nouveau lieu",
+                    address: "Adresse du lieu",
+                    city: "Conakry",
+                    capacity_max: 500,
+                    price_per_day: 500000
+                }
+            },
+            {
+                category: "Lieux",
+                method: "GET",
+                path: "/venues-get-venue",
+                description: "Récupérer un lieu",
+                auth: false,
+                params: [
+                    { name: "venue_id", type: "string", default: "" }
+                ],
+                body: null
+            },
+            {
+                category: "Lieux",
+                method: "POST",
+                path: "/venues-update-venue",
+                description: "Mettre à jour un lieu (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    venue_id: "",
+                    name: "Nouveau nom",
+                    price_per_day: 600000
+                }
+            },
+            {
+                category: "Lieux",
+                method: "POST",
+                path: "/venues-delete-venue",
+                description: "Supprimer un lieu (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    venue_id: ""
+                }
+            },
+            // GUESTS
+            {
+                category: "Invités",
+                method: "POST",
+                path: "/guests-add-guests",
+                description: "Ajouter des invités à un événement",
+                auth: true,
+                params: [],
+                body: {
+                    event_id: "",
+                    guests: [
+                        {
+                            first_name: "Sophie",
+                            last_name: "Dupont",
+                            email: "sophie@example.com",
+                            phone: "+224612345678",
+                            category: "guest"
+                        }
+                    ]
+                }
+            },
+            {
+                category: "Invités",
+                method: "POST",
+                path: "/guests-send-invitations",
+                description: "Envoyer des invitations aux invités",
+                auth: true,
+                params: [],
+                body: {
+                    event_id: "",
+                    guest_ids: [],
+                    custom_message: "Message personnalisé"
+                }
+            },
+            {
+                category: "Invités",
+                method: "POST",
+                path: "/guests-rsvp",
+                description: "Répondre à une invitation (publique)",
+                auth: false,
+                params: [],
+                body: {
+                    token: "",
+                    rsvp_status: "accepted",
+                    dietary_restrictions: []
+                }
+            },
+            {
+                category: "Invités",
+                method: "GET",
+                path: "/guests-get-guest-list",
+                description: "Récupérer la liste des invités",
+                auth: true,
+                params: [
+                    { name: "event_id", type: "string", default: "" },
+                    { name: "rsvp_status", type: "string", default: "" },
+                    { name: "category", type: "string", default: "" }
+                ],
+                body: null
+            },
+            {
+                category: "Invités",
+                method: "GET",
+                path: "/guests-get-guest",
+                description: "Récupérer un invité",
+                auth: true,
+                params: [
+                    { name: "guest_id", type: "string", default: "" }
+                ],
+                body: null
+            },
+            {
+                category: "Invités",
+                method: "POST",
+                path: "/guests-update-guest",
+                description: "Mettre à jour un invité",
+                auth: true,
+                params: [],
+                body: {
+                    guest_id: "",
+                    first_name: "Nouveau prénom",
+                    last_name: "Nouveau nom",
+                    rsvp_status: "accepted"
+                }
+            },
+            {
+                category: "Invités",
+                method: "POST",
+                path: "/guests-delete-guest",
+                description: "Supprimer un invité",
+                auth: true,
+                params: [],
+                body: {
+                    guest_id: ""
+                }
+            },
+            // PAYMENTS
+            {
+                category: "Paiements",
+                method: "POST",
+                path: "/payments-create-payment-intent",
+                description: "Créer une intention de paiement",
+                auth: true,
+                params: [],
+                body: {
+                    event_id: "",
+                    amount: 1000000,
+                    payment_type: "acompte",
+                    payment_method: "mobile_money",
+                    due_date: ""
+                }
+            },
+            {
+                category: "Paiements",
+                method: "POST",
+                path: "/payments-confirm-payment",
+                description: "Confirmer un paiement",
+                auth: true,
+                params: [],
+                body: {
+                    payment_id: "",
+                    transaction_id: "",
+                    payment_proof_url: ""
+                }
+            },
+            {
+                category: "Paiements",
+                method: "GET",
+                path: "/payments-get-payment-history",
+                description: "Récupérer l'historique des paiements",
+                auth: true,
+                params: [
+                    { name: "event_id", type: "string", default: "" },
+                    { name: "status", type: "string", default: "" },
+                    { name: "page", type: "number", default: "1" },
+                    { name: "limit", type: "number", default: "20" }
+                ],
+                body: null
+            },
+            {
+                category: "Paiements",
+                method: "GET",
+                path: "/payments-get-payment",
+                description: "Récupérer un paiement",
+                auth: true,
+                params: [
+                    { name: "payment_id", type: "string", default: "" }
+                ],
+                body: null
+            },
+            {
+                category: "Paiements",
+                method: "POST",
+                path: "/payments-update-payment",
+                description: "Mettre à jour un paiement",
+                auth: true,
+                params: [],
+                body: {
+                    payment_id: "",
+                    status: "paye",
+                    receipt_url: "https://example.com/receipt.pdf"
+                }
+            },
+            {
+                category: "Paiements",
+                method: "POST",
+                path: "/payments-delete-payment",
+                description: "Supprimer un paiement",
+                auth: true,
+                params: [],
+                body: {
+                    payment_id: ""
+                }
+            },
+            // MESSAGES
+            {
+                category: "Messages",
+                method: "POST",
+                path: "/messages-send-message",
+                description: "Envoyer un message",
+                auth: true,
+                params: [],
+                body: {
+                    event_id: "",
+                    recipient_id: "",
+                    subject: "Sujet du message",
+                    content: "Contenu du message"
+                }
+            },
+            {
+                category: "Messages",
+                method: "GET",
+                path: "/messages-get-messages",
+                description: "Récupérer les messages",
+                auth: true,
+                params: [
+                    { name: "event_id", type: "string", default: "" },
+                    { name: "other_user_id", type: "string", default: "" },
+                    { name: "is_read", type: "boolean", default: "" },
+                    { name: "page", type: "number", default: "1" },
+                    { name: "limit", type: "number", default: "50" }
+                ],
+                body: null
+            },
+            {
+                category: "Messages",
+                method: "POST",
+                path: "/messages-mark-as-read",
+                description: "Marquer un message comme lu",
+                auth: true,
+                params: [],
+                body: {
+                    message_id: "",
+                    message_ids: []
+                }
+            },
+            {
+                category: "Messages",
+                method: "GET",
+                path: "/messages-get-message",
+                description: "Récupérer un message",
+                auth: true,
+                params: [
+                    { name: "message_id", type: "string", default: "" }
+                ],
+                body: null
+            },
+            {
+                category: "Messages",
+                method: "POST",
+                path: "/messages-update-message",
+                description: "Mettre à jour un message",
+                auth: true,
+                params: [],
+                body: {
+                    message_id: "",
+                    content: "Contenu modifié"
+                }
+            },
+            {
+                category: "Messages",
+                method: "POST",
+                path: "/messages-delete-message",
+                description: "Supprimer un message",
+                auth: true,
+                params: [],
+                body: {
+                    message_id: ""
+                }
+            },
+            // NOTIFICATIONS
+            {
+                category: "Notifications",
+                method: "POST",
+                path: "/notifications-create-notification",
+                description: "Créer une notification (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    user_id: null,
+                    event_id: "",
+                    type: "quote_sent",
+                    title: "Titre de la notification",
+                    message: "Message de la notification"
+                }
+            },
+            {
+                category: "Notifications",
+                method: "POST",
+                path: "/notifications-mark-notification-read",
+                description: "Marquer une notification comme lue",
+                auth: true,
+                params: [],
+                body: {
+                    notification_id: "",
+                    notification_ids: []
+                }
+            },
+            {
+                category: "Notifications",
+                method: "GET",
+                path: "/notifications-get-notifications",
+                description: "Récupérer les notifications",
+                auth: true,
+                params: [
+                    { name: "is_read", type: "boolean", default: "" },
+                    { name: "type", type: "string", default: "" },
+                    { name: "page", type: "number", default: "1" },
+                    { name: "limit", type: "number", default: "50" }
+                ],
+                body: null
+            },
+            {
+                category: "Notifications",
+                method: "GET",
+                path: "/notifications-get-notification",
+                description: "Récupérer une notification",
+                auth: true,
+                params: [
+                    { name: "notification_id", type: "string", default: "" }
+                ],
+                body: null
+            },
+            {
+                category: "Notifications",
+                method: "POST",
+                path: "/notifications-update-notification",
+                description: "Mettre à jour une notification",
+                auth: true,
+                params: [],
+                body: {
+                    notification_id: "",
+                    is_read: true
+                }
+            },
+            {
+                category: "Notifications",
+                method: "POST",
+                path: "/notifications-delete-notification",
+                description: "Supprimer une notification",
+                auth: true,
+                params: [],
+                body: {
+                    notification_id: ""
+                }
+            },
+            // USERS
+            {
+                category: "Utilisateurs",
+                method: "GET",
+                path: "/users-get-users",
+                description: "Récupérer la liste des utilisateurs (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [
+                    { name: "role", type: "string", default: "" },
+                    { name: "search", type: "string", default: "" },
+                    { name: "page", type: "number", default: "1" },
+                    { name: "limit", type: "number", default: "20" }
+                ],
+                body: null
+            },
+            {
+                category: "Utilisateurs",
+                method: "GET",
+                path: "/users-get-user",
+                description: "Récupérer un utilisateur spécifique",
+                auth: true,
+                params: [
+                    { name: "user_id", type: "string", default: "" }
+                ],
+                body: null
+            },
+            {
+                category: "Utilisateurs",
+                method: "POST",
+                path: "/users-update-user",
+                description: "Mettre à jour un utilisateur",
+                auth: true,
+                params: [],
+                body: {
+                    user_id: "",
+                    first_name: "Nouveau prénom",
+                    last_name: "Nouveau nom",
+                    phone: "+224612345678",
+                    role: "admin"
+                }
+            },
+            {
+                category: "Utilisateurs",
+                method: "POST",
+                path: "/users-delete-user",
+                description: "Supprimer un utilisateur (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    user_id: ""
+                }
+            },
+            {
+                category: "Utilisateurs",
+                method: "POST",
+                path: "/users-change-role",
+                description: "Changer le rôle d'un utilisateur (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    user_id: "",
+                    role: "admin"
+                }
+            },
+            // ADMIN
+            {
+                category: "Administration",
+                method: "GET",
+                path: "/admin-dashboard-stats",
+                description: "Statistiques du dashboard (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [
+                    { name: "start_date", type: "string", default: "" },
+                    { name: "end_date", type: "string", default: "" }
+                ],
+                body: null
+            },
+            {
+                category: "Administration",
+                method: "GET",
+                path: "/admin-get-all-events",
+                description: "Récupérer tous les événements (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [
+                    { name: "status", type: "string", default: "" },
+                    { name: "event_type", type: "string", default: "" },
+                    { name: "start_date", type: "string", default: "" },
+                    { name: "end_date", type: "string", default: "" },
+                    { name: "client_id", type: "string", default: "" },
+                    { name: "page", type: "number", default: "1" },
+                    { name: "limit", type: "number", default: "20" }
+                ],
+                body: null
+            },
+            {
+                category: "Administration",
+                method: "POST",
+                path: "/admin-assign-provider",
+                description: "Assigner un prestataire à un service (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    event_service_id: "",
+                    provider_id: ""
+                }
+            },
+            {
+                category: "Administration",
+                method: "POST",
+                path: "/admin-generate-invoice",
+                description: "Générer une facture (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    quote_id: "",
+                    event_id: ""
+                }
+            },
+            // PUBLIC
+            {
+                category: "Public",
+                method: "GET",
+                path: "/public-get-blog-posts",
+                description: "Récupérer les articles de blog (publique)",
+                auth: false,
+                params: [
+                    { name: "category", type: "string", default: "" },
+                    { name: "tags", type: "string", default: "" },
+                    { name: "page", type: "number", default: "1" },
+                    { name: "limit", type: "number", default: "10" }
+                ],
+                body: null
+            },
+            {
+                category: "Public",
+                method: "GET",
+                path: "/public-get-testimonials",
+                description: "Récupérer les témoignages (publique)",
+                auth: false,
+                params: [
+                    { name: "is_featured", type: "boolean", default: "" },
+                    { name: "rating", type: "number", default: "" },
+                    { name: "page", type: "number", default: "1" },
+                    { name: "limit", type: "number", default: "10" }
+                ],
+                body: null
+            },
+            {
+                category: "Public",
+                method: "POST",
+                path: "/public-submit-contact-form",
+                description: "Soumettre le formulaire de contact (publique)",
+                auth: false,
+                params: [],
+                body: {
+                    name: "Nom",
+                    email: "email@example.com",
+                    subject: "Sujet",
+                    message: "Message"
+                }
+            },
+            // PROVIDERS
+            {
+                category: "Prestataires",
+                method: "POST",
+                path: "/providers-create-provider",
+                description: "Créer un prestataire (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    name: "Prestataire Example",
+                    service_type: "traiteur_boissons",
+                    email: "contact@prestataire.com",
+                    phone: "+224612345678"
+                }
+            },
+            {
+                category: "Prestataires",
+                method: "GET",
+                path: "/providers-get-providers",
+                description: "Récupérer la liste des prestataires",
+                auth: false,
+                params: [
+                    { name: "service_type", type: "string", default: "" },
+                    { name: "is_active", type: "boolean", default: "true" },
+                    { name: "search", type: "string", default: "" },
+                    { name: "page", type: "number", default: "1" },
+                    { name: "limit", type: "number", default: "50" }
+                ],
+                body: null
+            },
+            {
+                category: "Prestataires",
+                method: "GET",
+                path: "/providers-get-provider",
+                description: "Récupérer un prestataire",
+                auth: false,
+                params: [
+                    { name: "provider_id", type: "string", default: "" }
+                ],
+                body: null
+            },
+            {
+                category: "Prestataires",
+                method: "POST",
+                path: "/providers-update-provider",
+                description: "Mettre à jour un prestataire (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    provider_id: "",
+                    name: "Nouveau nom",
+                    is_active: true
+                }
+            },
+            {
+                category: "Prestataires",
+                method: "POST",
+                path: "/providers-delete-provider",
+                description: "Supprimer un prestataire (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    provider_id: ""
+                }
+            },
+            // CONTRACTS
+            {
+                category: "Contrats",
+                method: "POST",
+                path: "/contracts-create-contract",
+                description: "Créer un contrat (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    quote_id: "",
+                    content: "Contenu du contrat"
+                }
+            },
+            {
+                category: "Contrats",
+                method: "GET",
+                path: "/contracts-get-contracts",
+                description: "Récupérer les contrats",
+                auth: true,
+                params: [
+                    { name: "quote_id", type: "string", default: "" },
+                    { name: "page", type: "number", default: "1" },
+                    { name: "limit", type: "number", default: "20" }
+                ],
+                body: null
+            },
+            {
+                category: "Contrats",
+                method: "GET",
+                path: "/contracts-get-contract",
+                description: "Récupérer un contrat",
+                auth: true,
+                params: [
+                    { name: "contract_id", type: "string", default: "" }
+                ],
+                body: null
+            },
+            {
+                category: "Contrats",
+                method: "POST",
+                path: "/contracts-update-contract",
+                description: "Mettre à jour un contrat (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    contract_id: "",
+                    content: "Contenu modifié",
+                    signed_at: "2025-12-25T00:00:00Z"
+                }
+            },
+            {
+                category: "Contrats",
+                method: "POST",
+                path: "/contracts-delete-contract",
+                description: "Supprimer un contrat (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    contract_id: ""
+                }
+            },
+            // DOCUMENTS
+            {
+                category: "Documents",
+                method: "POST",
+                path: "/documents-create-document",
+                description: "Créer un document",
+                auth: true,
+                params: [],
+                body: {
+                    event_id: "",
+                    document_type: "invoice",
+                    title: "Facture",
+                    file_url: "https://example.com/document.pdf"
+                }
+            },
+            {
+                category: "Documents",
+                method: "GET",
+                path: "/documents-get-documents",
+                description: "Récupérer les documents",
+                auth: true,
+                params: [
+                    { name: "event_id", type: "string", default: "" },
+                    { name: "quote_id", type: "string", default: "" },
+                    { name: "contract_id", type: "string", default: "" },
+                    { name: "document_type", type: "string", default: "" },
+                    { name: "page", type: "number", default: "1" },
+                    { name: "limit", type: "number", default: "20" }
+                ],
+                body: null
+            },
+            {
+                category: "Documents",
+                method: "GET",
+                path: "/documents-get-document",
+                description: "Récupérer un document",
+                auth: true,
+                params: [
+                    { name: "document_id", type: "string", default: "" }
+                ],
+                body: null
+            },
+            {
+                category: "Documents",
+                method: "POST",
+                path: "/documents-update-document",
+                description: "Mettre à jour un document",
+                auth: true,
+                params: [],
+                body: {
+                    document_id: "",
+                    title: "Nouveau titre",
+                    file_url: "https://example.com/new-document.pdf"
+                }
+            },
+            {
+                category: "Documents",
+                method: "POST",
+                path: "/documents-delete-document",
+                description: "Supprimer un document",
+                auth: true,
+                params: [],
+                body: {
+                    document_id: ""
+                }
+            },
+            // BLOG
+            {
+                category: "Blog",
+                method: "POST",
+                path: "/blog-create-post",
+                description: "Créer un article de blog (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    title: "Titre de l'article",
+                    slug: "titre-article",
+                    content: "Contenu de l'article",
+                    is_published: false
+                }
+            },
+            {
+                category: "Blog",
+                method: "GET",
+                path: "/blog-get-post",
+                description: "Récupérer un article de blog",
+                auth: false,
+                params: [
+                    { name: "post_id", type: "string", default: "" },
+                    { name: "slug", type: "string", default: "" }
+                ],
+                body: null
+            },
+            {
+                category: "Blog",
+                method: "POST",
+                path: "/blog-update-post",
+                description: "Mettre à jour un article de blog (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    post_id: "",
+                    title: "Nouveau titre",
+                    content: "Nouveau contenu",
+                    is_published: true
+                }
+            },
+            {
+                category: "Blog",
+                method: "POST",
+                path: "/blog-delete-post",
+                description: "Supprimer un article de blog (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    post_id: ""
+                }
+            },
+            // TESTIMONIALS
+            {
+                category: "Témoignages",
+                method: "POST",
+                path: "/testimonials-create-testimonial",
+                description: "Créer un témoignage (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    rating: 5,
+                    comment: "Excellent service!",
+                    client_id: "",
+                    event_id: ""
+                }
+            },
+            {
+                category: "Témoignages",
+                method: "GET",
+                path: "/testimonials-get-testimonial",
+                description: "Récupérer un témoignage",
+                auth: false,
+                params: [
+                    { name: "testimonial_id", type: "string", default: "" }
+                ],
+                body: null
+            },
+            {
+                category: "Témoignages",
+                method: "POST",
+                path: "/testimonials-update-testimonial",
+                description: "Mettre à jour un témoignage (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    testimonial_id: "",
+                    is_approved: true,
+                    is_featured: true
+                }
+            },
+            {
+                category: "Témoignages",
+                method: "POST",
+                path: "/testimonials-delete-testimonial",
+                description: "Supprimer un témoignage (Admin uniquement)",
+                auth: true,
+                admin: true,
+                params: [],
+                body: {
+                    testimonial_id: ""
+                }
+            }
+        ];
+
+        function initApp() {
+            // Mettre à jour les statistiques
+            updateStats();
+            
+            const container = document.getElementById('endpoints-container');
+            
+            // Ordre logique des catégories
+            const categoryOrder = [
+                "Authentification",
+                "Utilisateurs",
+                "Événements",
+                "Devis",
+                "Contrats",
+                "Services",
+                "Prestataires",
+                "Lieux",
+                "Invités",
+                "Paiements",
+                "Messages",
+                "Notifications",
+                "Documents",
+                "Administration",
+                "Blog",
+                "Témoignages",
+                "Public"
+            ];
+            
+            const allCategories = [...new Set(endpoints.map(e => e.category))];
+            const orderedCategories = categoryOrder.filter(cat => allCategories.includes(cat));
+            const remainingCategories = allCategories.filter(cat => !categoryOrder.includes(cat));
+            const categories = [...orderedCategories, ...remainingCategories];
+
+            categories.forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'mb-12';
+                
+                const categoryTitle = document.createElement('h2');
+                categoryTitle.className = 'text-xl font-light text-gray-700 mb-6 pb-2 border-b border-gray-200';
+                categoryTitle.textContent = category;
+                
+                // Ajouter un compteur d'endpoints
+                const categoryEndpoints = endpoints.filter(e => e.category === category);
+                const countBadge = document.createElement('span');
+                countBadge.className = 'ml-3 text-sm font-normal text-gray-400';
+                countBadge.textContent = `(${categoryEndpoints.length})`;
+                categoryTitle.appendChild(countBadge);
+                
+                categoryDiv.appendChild(categoryTitle);
+
+                categoryEndpoints.forEach(endpoint => {
+                    const endpointDiv = createEndpointDiv(endpoint);
+                    categoryDiv.appendChild(endpointDiv);
+                });
+
+                container.appendChild(categoryDiv);
+            });
+        }
+
+        function createEndpointDiv(endpoint) {
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-lg shadow-sm border border-gray-100 mb-3 overflow-hidden hover:shadow-md transition-shadow';
+
+            const header = document.createElement('div');
+            header.className = 'px-5 py-4 bg-gray-50 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors';
+            header.onclick = () => toggleEndpoint(div);
+
+            const headerContent = document.createElement('div');
+            headerContent.className = 'flex items-center justify-between';
+
+            const leftSection = document.createElement('div');
+            leftSection.className = 'flex items-center space-x-3 flex-1';
+
+            const methodBadge = document.createElement('span');
+            methodBadge.className = `method-badge method-${endpoint.method.toLowerCase()} text-white px-2.5 py-0.5 rounded`;
+            methodBadge.textContent = endpoint.method;
+
+            const pathSpan = document.createElement('span');
+            pathSpan.className = 'font-mono text-gray-700 font-normal text-sm';
+            pathSpan.textContent = endpoint.path;
+
+            if (endpoint.auth === false) {
+                const badge = document.createElement('span');
+                badge.className = 'ml-2 px-2 py-0.5 bg-green-50 text-green-600 text-xs font-medium rounded border border-green-200';
+                badge.textContent = 'PUBLIC';
+                pathSpan.appendChild(badge);
+            } else if (endpoint.admin) {
+                const badge = document.createElement('span');
+                badge.className = 'ml-2 px-2 py-0.5 bg-amber-50 text-amber-600 text-xs font-medium rounded border border-amber-200';
+                badge.textContent = 'ADMIN';
+                pathSpan.appendChild(badge);
+            } else {
+                const badge = document.createElement('span');
+                badge.className = 'ml-2 px-2 py-0.5 bg-orange-50 text-orange-600 text-xs font-medium rounded border border-orange-200';
+                badge.textContent = 'AUTH';
+                pathSpan.appendChild(badge);
+            }
+
+            const toggle = document.createElement('svg');
+            toggle.className = 'endpoint-toggle w-4 h-4 text-gray-400';
+            toggle.fill = 'none';
+            toggle.stroke = 'currentColor';
+            toggle.viewBox = '0 0 24 24';
+            toggle.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>';
+
+            leftSection.appendChild(methodBadge);
+            leftSection.appendChild(pathSpan);
+            headerContent.appendChild(leftSection);
+            headerContent.appendChild(toggle);
+            header.appendChild(headerContent);
+
+            const content = document.createElement('div');
+            content.className = 'endpoint-content hidden p-6';
+
+            const description = document.createElement('p');
+            description.className = 'text-gray-500 text-sm mb-6 font-light';
+            description.textContent = endpoint.description;
+            content.appendChild(description);
+
+            if (endpoint.params && endpoint.params.length > 0) {
+                const paramsSection = document.createElement('div');
+                paramsSection.className = 'mb-6';
+
+                const paramsTitle = document.createElement('h4');
+                paramsTitle.className = 'text-xs font-medium text-gray-400 mb-3 uppercase tracking-wider';
+                paramsTitle.textContent = 'Paramètres de requête';
+                paramsSection.appendChild(paramsTitle);
+
+                const paramsTable = document.createElement('div');
+                paramsTable.className = 'bg-gray-50 rounded-md border border-gray-100 overflow-hidden';
+
+                endpoint.params.forEach((param, index) => {
+                    const paramRow = document.createElement('div');
+                    paramRow.className = `grid grid-cols-12 gap-4 p-3 ${index !== endpoint.params.length - 1 ? 'border-b border-gray-100' : ''}`;
+
+                    const nameCell = document.createElement('div');
+                    nameCell.className = 'col-span-3';
+                    const nameLabel = document.createElement('span');
+                    nameLabel.className = 'font-mono font-medium text-xs text-gray-600';
+                    nameLabel.textContent = param.name;
+                    nameCell.appendChild(nameLabel);
+
+                    const inputCell = document.createElement('div');
+                    inputCell.className = 'col-span-7';
+                    const input = document.createElement('input');
+                    input.type = param.type === 'number' ? 'number' : 'text';
+                    input.className = 'w-full px-2.5 py-1.5 text-xs border border-gray-200 rounded-md focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white text-gray-700';
+                    input.id = `param-${endpoint.path}-${param.name}`;
+                    input.placeholder = param.default || '';
+                    input.value = param.default || '';
+                    inputCell.appendChild(input);
+
+                    const typeCell = document.createElement('div');
+                    typeCell.className = 'col-span-2 text-right';
+                    const typeSpan = document.createElement('span');
+                    typeSpan.className = 'text-xs text-gray-400 font-normal';
+                    typeSpan.textContent = param.type;
+                    typeCell.appendChild(typeSpan);
+
+                    paramRow.appendChild(nameCell);
+                    paramRow.appendChild(inputCell);
+                    paramRow.appendChild(typeCell);
+                    paramsTable.appendChild(paramRow);
+                });
+
+                paramsSection.appendChild(paramsTable);
+                content.appendChild(paramsSection);
+            }
+
+            if (endpoint.body !== null) {
+                const bodySection = document.createElement('div');
+                bodySection.className = 'mb-6';
+
+                const bodyTitle = document.createElement('h4');
+                bodyTitle.className = 'text-xs font-medium text-gray-400 mb-3 uppercase tracking-wider';
+                bodyTitle.textContent = 'Corps de la requête';
+                bodySection.appendChild(bodyTitle);
+
+                const textarea = document.createElement('textarea');
+                textarea.className = 'json-editor w-full px-4 py-3 bg-gray-50 text-gray-700 rounded-md border border-gray-200 focus:ring-1 focus:ring-orange-500 focus:border-orange-500 resize-y min-h-[180px] scrollbar-thin';
+                textarea.id = `body-${endpoint.path}`;
+                textarea.value = JSON.stringify(endpoint.body, null, 2);
+                bodySection.appendChild(textarea);
+
+                content.appendChild(bodySection);
+            }
+
+            const button = document.createElement('button');
+            button.className = 'w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 px-6 rounded-md transition-colors duration-200 text-sm';
+            button.textContent = 'Exécuter la requête';
+            button.onclick = () => executeRequest(endpoint, content);
+            content.appendChild(button);
+
+            const responseSection = document.createElement('div');
+            responseSection.className = 'mt-6';
+
+            const responseTitle = document.createElement('h4');
+            responseTitle.className = 'text-xs font-medium text-gray-400 mb-3 uppercase tracking-wider';
+            responseTitle.textContent = 'Réponse';
+            responseSection.appendChild(responseTitle);
+
+            const responseBox = document.createElement('div');
+            responseBox.className = 'response-box bg-gray-50 text-gray-700 rounded-md border border-gray-200 p-4 min-h-[100px] max-h-[500px] overflow-y-auto scrollbar-thin';
+            responseBox.id = `response-${endpoint.path}`;
+            responseBox.textContent = 'Aucune réponse pour le moment...';
+            responseSection.appendChild(responseBox);
+            content.appendChild(responseSection);
+
+            div.appendChild(header);
+            div.appendChild(content);
+
+            return div;
+        }
+
+        function toggleEndpoint(div) {
+            const content = div.querySelector('.endpoint-content');
+            const toggle = div.querySelector('.endpoint-toggle');
+
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                toggle.classList.add('open');
+            } else {
+                content.classList.add('hidden');
+                toggle.classList.remove('open');
+            }
+        }
+
+        async function executeRequest(endpoint, contentDiv) {
+            const baseUrl = document.getElementById('baseUrl').value;
+            const authToken = document.getElementById('authToken').value;
+            const responseBox = document.getElementById(`response-${endpoint.path}`);
+
+            if (endpoint.auth && !authToken) {
+                responseBox.className = 'response-box bg-red-50 text-red-700 rounded-md border border-red-200 p-4 min-h-[100px] max-h-[500px] overflow-y-auto scrollbar-thin';
+                responseBox.textContent = '❌ Erreur : Token d\'authentification requis pour cette route.';
+                return;
+            }
+
+            let url = baseUrl + endpoint.path;
+            const params = [];
+            if (endpoint.params) {
+                endpoint.params.forEach(param => {
+                    const input = document.getElementById(`param-${endpoint.path}-${param.name}`);
+                    if (input && input.value) {
+                        params.push(`${param.name}=${encodeURIComponent(input.value)}`);
+                    }
+                });
+            }
+            if (params.length > 0) {
+                url += '?' + params.join('&');
+            }
+
+            let body = null;
+            if (endpoint.body !== null) {
+                const bodyTextarea = document.getElementById(`body-${endpoint.path}`);
+                try {
+                    body = JSON.parse(bodyTextarea.value);
+                } catch (e) {
+                    responseBox.className = 'response-box bg-red-50 text-red-700 rounded-md border border-red-200 p-4 min-h-[100px] max-h-[500px] overflow-y-auto scrollbar-thin';
+                    responseBox.textContent = `❌ Erreur : JSON invalide dans le corps de la requête.\n${e.message}`;
+                    return;
+                }
+            }
+
+            responseBox.className = 'response-box bg-blue-50 text-blue-700 rounded-md border border-blue-200 p-4 min-h-[100px] max-h-[500px] overflow-y-auto scrollbar-thin';
+            responseBox.innerHTML = '<span class="loading-spinner"></span> Envoi de la requête...';
+
+            try {
+                const options = {
+                    method: endpoint.method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+
+                if (endpoint.auth && authToken) {
+                    options.headers['Authorization'] = `Bearer ${authToken}`;
+                }
+
+                if (body) {
+                    options.body = JSON.stringify(body);
+                }
+
+                const response = await fetch(url, options);
+                const data = await response.json();
+
+                const statusClass = response.ok ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200';
+                responseBox.className = `response-box ${statusClass} rounded-md border p-4 min-h-[100px] max-h-[500px] overflow-y-auto scrollbar-thin`;
+                
+                let responseText = '';
+                const statusBadge = response.ok ? 
+                    `<span class="inline-block px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded mb-2 border border-green-200">HTTP ${response.status}</span>\n\n` :
+                    `<span class="inline-block px-2 py-0.5 bg-red-100 text-red-700 text-xs font-medium rounded mb-2 border border-red-200">HTTP ${response.status}</span>\n\n`;
+                responseText += statusBadge;
+                responseText += JSON.stringify(data, null, 2);
+
+                responseBox.innerHTML = responseText;
+            } catch (error) {
+                responseBox.className = 'response-box bg-red-50 text-red-700 rounded-md border border-red-200 p-4 min-h-[100px] max-h-[500px] overflow-y-auto scrollbar-thin';
+                responseBox.textContent = `❌ Erreur : ${error.message}`;
+            }
+        }
+
+        function updateStats() {
+            const totalEndpoints = endpoints.length;
+            const publicEndpoints = endpoints.filter(e => e.auth === false).length;
+            const authEndpoints = endpoints.filter(e => e.auth === true && !e.admin).length;
+            const adminEndpoints = endpoints.filter(e => e.admin === true).length;
+            const categories = [...new Set(endpoints.map(e => e.category))].length;
+            
+            const statsText = `${totalEndpoints} endpoints au total • ${categories} catégories • ${publicEndpoints} publiques • ${authEndpoints} authentifiées • ${adminEndpoints} admin`;
+            document.getElementById('api-stats').textContent = statsText;
+        }
+
+        initApp();
+    </script>
+</body>
+</html>

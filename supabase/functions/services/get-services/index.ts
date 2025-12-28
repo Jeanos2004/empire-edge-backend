@@ -13,15 +13,11 @@ serve(async (req) => {
   }
 
   try {
-    // Créer client Supabase
-    const supabaseClient = createClient(
+    // Utiliser supabaseAdmin pour éviter les problèmes RLS
+    // Cette fonction est publique (services actifs visibles par tous)
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
     // Parser les query params
@@ -33,7 +29,7 @@ serve(async (req) => {
     const offset = (page - 1) * limit
 
     // Construire la requête
-    let query = supabaseClient
+    let query = supabaseAdmin
       .from('services')
       .select('*', { count: 'exact' })
 

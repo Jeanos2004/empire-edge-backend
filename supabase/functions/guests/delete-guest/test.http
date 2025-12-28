@@ -1,0 +1,12 @@
+### ============================================
+### GUESTS DELETE GUEST
+### ============================================
+
+### Test
+POST {baseUrl}/guests-delete-guest
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

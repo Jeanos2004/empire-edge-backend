@@ -1,0 +1,12 @@
+### ============================================
+### SERVICES GET SERVICE
+### ============================================
+
+### Test
+GET {baseUrl}/services-get-service
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

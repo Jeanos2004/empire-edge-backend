@@ -1,0 +1,12 @@
+### ============================================
+### GUESTS GET GUEST
+### ============================================
+
+### Test
+GET {baseUrl}/guests-get-guest
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

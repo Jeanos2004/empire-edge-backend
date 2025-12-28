@@ -1,0 +1,12 @@
+### ============================================
+### TESTIMONIALS CREATE TESTIMONIAL
+### ============================================
+
+### Test
+POST {baseUrl}/testimonials-create-testimonial
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

@@ -1,0 +1,12 @@
+### ============================================
+### PROVIDERS UPDATE PROVIDER
+### ============================================
+
+### Test
+POST {baseUrl}/providers-update-provider
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}

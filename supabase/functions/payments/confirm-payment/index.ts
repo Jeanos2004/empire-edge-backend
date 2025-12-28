@@ -33,57 +33,66 @@ serve(async (req) => {
       throw new Error('Non authentifié')
     }
 
+    // Créer un client avec service role pour récupérer le profil (évite les problèmes RLS)
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
     // Récupérer le profil
-    const { data: profile } = await supabaseClient
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single()
 
-    if (!profile) {
-      throw new Error('Profil introuvable')
+    if (profileError || !profile) {
+      throw new Error(`Profil introuvable: ${profileError?.message || 'Profil non trouvé'}`)
     }
 
     // Parser le body
     const body = await req.json()
 
-    if (!body.payment_id) {
-      throw new Error('payment_id est requis')
+    // Accepter payment_id ou payment_intent_id
+    const paymentId = body.payment_id || body.payment_intent_id
+
+    if (!paymentId) {
+      throw new Error('payment_id ou payment_intent_id est requis')
     }
 
-    // Vérifier que le paiement existe
-    const { data: payment, error: paymentError } = await supabaseClient
+    // Vérifier que le paiement existe (utiliser supabaseAdmin pour éviter RLS)
+    const { data: payment, error: paymentError } = await supabaseAdmin
       .from('payments')
       .select(`
         *,
         events(id, client_id)
       `)
-      .eq('id', body.payment_id)
+      .eq('id', paymentId)
       .single()
 
     if (paymentError || !payment) {
-      throw new Error('Paiement introuvable')
+      throw new Error(`Paiement introuvable: ${paymentError?.message || 'Paiement non trouvé'}`)
     }
 
-    // Vérifier les permissions
+    // Vérifier les permissions (les admins peuvent accéder à tous les paiements)
     if (profile.role === 'client') {
-      const { data: client } = await supabaseClient
+      const { data: client } = await supabaseAdmin
         .from('clients')
-        .select('profile_id')
+        .select('id, profile_id')
         .eq('profile_id', user.id)
         .single()
 
-      if (!client || payment.events.client_id !== client.profile_id) {
+      if (!client || payment.events.client_id !== client.id) {
         throw new Error('Accès non autorisé à ce paiement')
       }
     }
 
     // Vérifier que le paiement peut être confirmé
-    if (payment.status === 'paid') {
+    if (payment.status === 'paye') {
       throw new Error('Ce paiement a déjà été confirmé')
     }
 
-    if (payment.status === 'cancelled') {
+    if (payment.status === 'annule') {
       throw new Error('Impossible de confirmer un paiement annulé')
     }
 
@@ -93,16 +102,21 @@ serve(async (req) => {
     //   throw new Error('Le paiement n\'a pas été validé par le service de paiement')
     // }
 
-    // Mettre à jour le paiement
-    const { data: updatedPayment, error: updateError } = await supabaseClient
+    // Mettre à jour le paiement (utiliser supabaseAdmin pour éviter RLS)
+    // Accepter receipt_url ou payment_proof_url
+    const receiptUrl = body.receipt_url || body.payment_proof_url || null
+    const transactionId = body.transaction_id || payment.transaction_id
+
+    const { data: updatedPayment, error: updateError } = await supabaseAdmin
       .from('payments')
       .update({
-        status: 'paid',
+        status: 'paye',
         paid_at: new Date().toISOString(),
         payment_method: body.payment_method || payment.payment_method,
-        receipt_url: body.receipt_url || null,
+        receipt_url: receiptUrl,
+        transaction_id: transactionId,
       })
-      .eq('id', body.payment_id)
+      .eq('id', paymentId)
       .select()
       .single()
 
@@ -110,8 +124,8 @@ serve(async (req) => {
       throw new Error(`Erreur lors de la confirmation du paiement: ${updateError.message}`)
     }
 
-    // Créer une notification pour l'admin
-    await supabaseClient
+    // Créer une notification pour l'admin (utiliser supabaseAdmin)
+    await supabaseAdmin
       .from('notifications')
       .insert({
         user_id: null, // Notification pour tous les admins

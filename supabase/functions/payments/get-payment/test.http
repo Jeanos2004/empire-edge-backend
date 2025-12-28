@@ -1,0 +1,12 @@
+### ============================================
+### PAYMENTS GET PAYMENT
+### ============================================
+
+### Test
+GET {baseUrl}/payments-get-payment
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "test": "data"
+}
