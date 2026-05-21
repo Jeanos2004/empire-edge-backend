@@ -1,0 +1,6 @@
+{
+  "importMap": "./supabase/functions/import_map.json",
+  "tasks": {
+    "start": "deno run --allow-net supabase/functions/main.ts"
+  }
+}

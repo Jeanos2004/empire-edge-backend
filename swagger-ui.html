@@ -330,6 +330,31 @@
             {
                 category: "Devis",
                 method: "POST",
+                path: "/quotes-submit-request",
+                description: "Soumettre une demande de devis (Client)",
+                auth: true,
+                params: [],
+                body: {
+                    event_type: "mariage_moderne",
+                    event_date: "2025-12-25",
+                    guest_count: 200,
+                    desired_location: "Conakry",
+                    services: {
+                        "Traiteur": true,
+                        "Décoration": true
+                    },
+                    details: {
+                        budget: 15000000,
+                        style: "moderne",
+                        colorTheme: "Blanc et or",
+                        notes: "Commentaires spéciaux",
+                        contactMethod: "WhatsApp"
+                    }
+                }
+            },
+            {
+                category: "Devis",
+                method: "POST",
                 path: "/quotes-reject-quote",
                 description: "Rejeter un devis",
                 auth: true,

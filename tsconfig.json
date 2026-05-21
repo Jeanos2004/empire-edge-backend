@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "lib": ["ESNext", "DOM"],
+    "strict": false,
+    "noImplicitAny": false,
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "https://*": ["node_modules/*"]
+    }
+  },
+  "exclude": ["node_modules"]
+}
