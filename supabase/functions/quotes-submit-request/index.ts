@@ -33,7 +33,7 @@ serve(async (req) => {
     }
 
     const body = await req.json()
-    const { event_type, event_date, guest_count, desired_location, services, details } = body
+    const { event_type, event_date, guest_count, desired_location, services, services_preferences, details } = body
 
     // Aplatir l'objet des services (ex: { mariage_services: ['hall', 'catering'] } -> ['hall', 'catering'])
     const flattenedServices = []
@@ -51,6 +51,7 @@ serve(async (req) => {
       guest_count,
       location: desired_location,
       services: flattenedServices,
+      services_preferences,
       ...details
     }
 

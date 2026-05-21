@@ -59,7 +59,7 @@ serve(async (req) => {
       if (body.provider_price === undefined) throw new Error('provider_price est requis')
 
       // Fetch the provider to get its details
-      const { data: provider, error: providerError } = await supabaseClient
+      const { data: provider, error: providerError } = await supabaseAdmin
         .from('providers')
         .select('id, name')
         .eq('id', body.provider_id)
